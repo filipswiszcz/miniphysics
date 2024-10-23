@@ -17,13 +17,14 @@ set(RUSH_CORE
     # src/core/
 )
 set(RUSH_UTIL
+    src/util/shader_loader.cpp
     # src/util/cmd_family_finder.cpp
     # src/util/gpu_picker.cpp
     # src/util/logger.cpp
 )
 set(SOURCES
     # ${RUSH_CORE}
-    # ${RUSH_UTIL}
+    ${RUSH_UTIL}
     
     src/main.cpp
 )
