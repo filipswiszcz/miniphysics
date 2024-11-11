@@ -4,6 +4,7 @@ project(rush VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_C_FLAGS "-DLOG_USE_COLOR")
 
 # find libraries
 if (NOT CMAKE_VERSION VERSION_LESS 3.7.0)
@@ -17,15 +18,12 @@ set(RUSH_CORE
     # src/core/
 )
 set(RUSH_UTIL
+    src/util/log.c
     src/util/shader_loader.cpp
-    # src/util/cmd_family_finder.cpp
-    # src/util/gpu_picker.cpp
-    # src/util/logger.cpp
 )
 set(SOURCES
     # ${RUSH_CORE}
     ${RUSH_UTIL}
-    
     src/main.cpp
 )
 

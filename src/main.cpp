@@ -1,5 +1,8 @@
 #include <iostream>
 
+extern "C" {
+    #include <rush/util/log.h>
+}
 #include <rush/util/shader_loader.hpp>
 
 const size_t WIDTH = 1280;
@@ -14,6 +17,9 @@ void input(GLFWwindow *window) {
 void render() {}
 
 int main() {
+
+    log_debug("asd");
+
     GLFWwindow *window;
 
     if (!glfwInit()) return -1;
