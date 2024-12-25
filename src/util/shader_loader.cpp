@@ -1,9 +1,12 @@
+extern "C" {
+    #include <rush/util/log.h>
+}
 #include <rush/util/shader_loader.hpp>
 
 #pragma mark - Shader_Loader
 #pragma region Shader_Loader {
 
-std::string util::read_file(const std::string& name) {
+std::string util::read_shader_file(const std::string& name) {
     std::ifstream file(name);
     if (!file) {
         std::cout << "file not found" << std::endl; return "";
@@ -12,7 +15,7 @@ std::string util::read_file(const std::string& name) {
     return code;
 }
 
-GLuint util::compile(const std::string& code, GLenum type) {
+GLuint util::compile_shader(const std::string& code, GLenum type) {
     GLuint shader = glCreateShader(type);
     const char* source = code.c_str();
 
@@ -30,7 +33,7 @@ GLuint util::compile(const std::string& code, GLenum type) {
     return shader;
 }
 
-GLuint util::link(GLuint vertex_shader, GLuint frag_shader) {
+GLuint util::link_shaders(GLuint vertex_shader, GLuint frag_shader) {
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
     glAttachShader(program, frag_shader);
@@ -41,7 +44,8 @@ GLuint util::link(GLuint vertex_shader, GLuint frag_shader) {
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {
         glGetProgramInfoLog(program, 512, NULL, info);
-        std::cout << "shader did not link: " << info << std::endl; return 0;
+        log_fatal("shaders did not link.");
+        // std::cout << "shaders did not link: " << info << std::endl; return 0;
     }
 
     return program;
