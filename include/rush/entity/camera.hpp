@@ -12,7 +12,7 @@ namespace entity {
             float mouse_x, mouse_y;
             float yaw = -90.0f, pitch = 0.0f;
 
-            float speed = 0.05f, sensitivity = 0.2f;
+            float speed = 2.0f, sensitivity = 0.2f;
 
         public:
 
