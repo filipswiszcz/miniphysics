@@ -217,11 +217,13 @@ static void print_log_content(log_event *evt) {
 #endif
 }
 
-void call_log_event(int type, char *frmt, ...) {
-    char *content = frmt;
+void call_log_event(int type, const char *frmt, ...) {
+    int use = 0;
+    char *p_frmt;
 #ifdef LOG_USE_BUILDER
+    use = 1;
     va_list args;
-    char *p;
+    const char *p;
     str_builder *b = str_builder_init();
     va_start(args, frmt);
     for (p = frmt; *p; p++) {
@@ -262,15 +264,17 @@ void call_log_event(int type, char *frmt, ...) {
         }
     }
     va_end(args);
-    content = str_builder_get(b);
+    p_frmt = str_builder_get(b);
     str_builder_destroy(b);
 #endif
     time_t t = time(NULL);
     log_event evt = {
         .type = type,
-        .frmt = content,
+        .frmt = use == 0 ? frmt : p_frmt,
         .time = localtime(&t),
     };
     print_log_content(&evt);
-    free(content);
+#ifdef LOG_USE_BUILDER
+    free(p_frmt);
+#endif
 }
