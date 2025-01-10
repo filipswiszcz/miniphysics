@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <rush/entity/camera.hpp>
+#include <rush/entity/mesh.hpp>
 extern "C" {
     #include <rush/util/log.h>
 }
@@ -15,17 +16,24 @@ const size_t WIDTH = 1280;
 const size_t HEIGHT = 960;
 const char* WINDOW_NAME = "rush (BUILD v0.1.5)";
 
-bool is_first_play = true;
+float TIME_OF_LAST_FRAME = 0.0f;
+float TIME_BETWEEN_FRAMES = 0.0f;
+float FRAMES_PER_SECOND = 0.0f;
+int TEMPORARY_FRAMES_HOLDER = 0;
+
+float CAMERA_TIME_BETWEEN_FRAMES = 0.0f;
+float CAMERA_TIME_OF_LAST_FRAME = 0.0f;
+
+bool IS_FIRST_PLAY = true;
 
 void mouse_input(GLFWwindow *window, entity::Camera &camera) {
     double mouse_x, mouse_y;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
-    if (is_first_play) {
+    if (IS_FIRST_PLAY) {
         camera.set_mouse_x(mouse_x);
         camera.set_mouse_y(mouse_y);
-
-        is_first_play = false;
+        IS_FIRST_PLAY = false;
     }
 
     float offset_x = mouse_x - camera.get_mouse_x();
@@ -53,15 +61,29 @@ void mouse_input(GLFWwindow *window, entity::Camera &camera) {
 
 void keyboard_input(GLFWwindow *window, entity::Camera &camera) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.set_position(camera.get_position() + (camera.get_target_position() * camera.get_speed()));
+        camera.set_position(camera.get_position() + (camera.get_target_position() * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES)));
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.set_position(camera.get_position() - (camera.get_target_position() * camera.get_speed()));
+        camera.set_position(camera.get_position() - (camera.get_target_position() * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES)));
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.set_position(camera.get_position() - glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * camera.get_speed());
+        camera.set_position(camera.get_position() - glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES));
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.set_position(camera.get_position() + glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * camera.get_speed());
+        camera.set_position(camera.get_position() + glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES));
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void frames_update(GLFWwindow *window) {
+    float current_time = static_cast<float>(glfwGetTime());
+    TIME_BETWEEN_FRAMES = current_time - TIME_OF_LAST_FRAME;
+    TEMPORARY_FRAMES_HOLDER++;
+    if (TIME_BETWEEN_FRAMES > 1.0) {
+        FRAMES_PER_SECOND = TEMPORARY_FRAMES_HOLDER / TIME_BETWEEN_FRAMES;
+        TEMPORARY_FRAMES_HOLDER = 0;
+        TIME_OF_LAST_FRAME = current_time;
+        std::ostringstream modif_window_name;
+        modif_window_name << WINDOW_NAME << " [" << static_cast<int>(FRAMES_PER_SECOND) << " FPS]";
+        glfwSetWindowTitle(window, (modif_window_name.str()).c_str());
+    }
 }
 
 int main() {
@@ -72,8 +94,8 @@ int main() {
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, WINDOW_NAME, NULL, NULL);
     if (!window) {
@@ -166,8 +188,15 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // fuck it
+    // std::vector<glm::vec3> fuck_it_vertices;
+    // std::vector<glm::vec2> fuck_it_uvs;
+    // std::vector<glm::vec3> fuck_it_normals;
+    // util::load_obj("resources/models/untitled.obj", fuck_it_vertices, fuck_it_uvs, fuck_it_normals);
+    // end of fuck it
 
     // texture
     unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
@@ -185,6 +214,14 @@ int main() {
     camera.set_up_position(glm::vec3(0.0f, 1.0f, 0.0f));
 
     while (!glfwWindowShouldClose(window)) {
+        // change time
+        float current_frame_time = static_cast<float>(glfwGetTime());
+        CAMERA_TIME_BETWEEN_FRAMES = current_frame_time - CAMERA_TIME_OF_LAST_FRAME;
+        CAMERA_TIME_OF_LAST_FRAME = current_frame_time;
+
+        // frames
+        frames_update(window);
+
         // inputs
         keyboard_input(window, camera);
         mouse_input(window, camera);
@@ -208,13 +245,10 @@ int main() {
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
+            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // idk something
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
