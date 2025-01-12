@@ -25,9 +25,7 @@ namespace util {
 
     unsigned int temp_load_texture(const std::string &filename);
 
-    void load_mesh(const std::string &filename, float vertices[]);
-
-    void load_obj(const std::string& name, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals);
+    void load_mesh(const std::string &filename, std::vector<float> &vertices);
 
 } // namespace util
 

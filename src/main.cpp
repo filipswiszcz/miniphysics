@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include <rush/entity/camera.hpp>
 #include <rush/entity/mesh.hpp>
@@ -116,62 +117,68 @@ int main() {
     GLuint program = util::link_shaders(vertex_shader, frag_shader);
     // end of shader code
 
+    // something
+    std::vector<float> vertices;
+    util::load_mesh("resources/models/sphere.obj", vertices);
+
+    // end of something
+
     // render with depth
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    // float vertices[] = {
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    // };
 
     glm::vec3 positions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(0.0f, 0.0f, -3.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
         glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)
     };
 
     unsigned int vbo, vao;
@@ -181,7 +188,7 @@ int main() {
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
@@ -191,18 +198,12 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // fuck it
-    // std::vector<glm::vec3> fuck_it_vertices;
-    // std::vector<glm::vec2> fuck_it_uvs;
-    // std::vector<glm::vec3> fuck_it_normals;
-    // util::load_obj("resources/models/untitled.obj", fuck_it_vertices, fuck_it_uvs, fuck_it_normals);
-    // end of fuck it
-
     // texture
-    unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
+    // unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
+    unsigned int texture = util::temp_load_texture("resources/textures/fantasy_world_map.png");
 
     glUseProgram(program);
-    glUniform1i(glGetUniformLocation(program, "temp_texture"), 0);
+    glUniform1i(glGetUniformLocation(program, "texture_t"), 0);
     // end of texture
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
@@ -231,7 +232,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, temp_texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         glUseProgram(program);
 
@@ -239,14 +240,14 @@ int main() {
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 
         glBindVertexArray(vao);
-        for (unsigned int i = 0; i < 10; i++) {
+        for (unsigned int i = 0; i < 1; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, positions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            // float angle = 20.0f * i;
+            // model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 5);
         }
 
         glfwSwapBuffers(window);

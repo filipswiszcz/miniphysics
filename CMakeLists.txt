@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(rush VERSION 0.0.1)
+project(rush VERSION 0.1.5)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -27,7 +27,7 @@ set(RUSH_UTIL
 )
 set(SOURCES
     ${RUSH_ENTITY}
-    # ${RUSH_CORE}
+    ${RUSH_CORE}
     ${RUSH_UTIL}
     src/main.cpp
 )
