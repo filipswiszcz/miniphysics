@@ -15,7 +15,7 @@ extern "C" {
 
 const size_t WIDTH = 1280;
 const size_t HEIGHT = 960;
-const char* WINDOW_NAME = "rush (BUILD v0.1.5)";
+const char* WINDOW_NAME = "rush (BUILD v0.1.7)";
 
 float TIME_OF_LAST_FRAME = 0.0f;
 float TIME_BETWEEN_FRAMES = 0.0f;
@@ -26,6 +26,7 @@ float CAMERA_TIME_BETWEEN_FRAMES = 0.0f;
 float CAMERA_TIME_OF_LAST_FRAME = 0.0f;
 
 bool IS_FIRST_PLAY = true;
+bool IS_FULLSCREEN = false;
 
 void mouse_input(GLFWwindow *window, entity::Camera &camera) {
     double mouse_x, mouse_y;
@@ -69,6 +70,19 @@ void keyboard_input(GLFWwindow *window, entity::Camera &camera) {
         camera.set_position(camera.get_position() - glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES));
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.set_position(camera.get_position() + glm::normalize(glm::cross(camera.get_target_position(), camera.get_up_position())) * (camera.get_speed() * CAMERA_TIME_BETWEEN_FRAMES));
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        // it works but really weird and needs fixing
+        int k;
+        GLFWmonitor **monitors = glfwGetMonitors(&k);
+        GLFWmonitor *monitor = monitors[1];
+        const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+        if (IS_FULLSCREEN) {glfwSetWindowMonitor(window, nullptr, 0, 0, WIDTH, HEIGHT, mode -> refreshRate); IS_FULLSCREEN = false;}
+        else {glfwSetWindowMonitor(window, monitor, 0, 0, mode -> width, mode -> height, mode -> refreshRate); IS_FULLSCREEN = true;}
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.set_speed(5.0f);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+        camera.set_speed(2.0f);
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
@@ -117,11 +131,10 @@ int main() {
     GLuint program = util::link_shaders(vertex_shader, frag_shader);
     // end of shader code
 
-    // something
+    // mesh code
     std::vector<float> vertices;
     util::load_mesh("resources/models/sphere.obj", vertices);
-
-    // end of something
+    // end of mesh code
 
     // render with depth
     // float vertices[] = {
@@ -168,18 +181,26 @@ int main() {
     //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     // };
 
-    glm::vec3 positions[] = {
-        glm::vec3(0.0f, 0.0f, -3.0f),
-        glm::vec3(2.0f, 5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f, 3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f, 2.0f, -2.5f),
-        glm::vec3(1.5f, 0.2f, -1.5f),
-        glm::vec3(-1.3f, 1.0f, -1.5f)
-    };
+    glm::vec3 positions[256];
+    unsigned int index = 0;
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
+            positions[index] = glm::vec3(i * 2.0f, 0.0f, j * 2.0f); index++;
+        }
+    }
+
+    // glm::vec3 positions[] = {
+    //     glm::vec3(0.0f, 0.0f, -3.0f),
+    //     glm::vec3(2.0f, 5.0f, -15.0f),
+    //     glm::vec3(-1.5f, -2.2f, -2.5f),
+    //     glm::vec3(-3.8f, -2.0f, -12.3f),
+    //     glm::vec3(2.4f, -0.4f, -3.5f),
+    //     glm::vec3(-1.7f, 3.0f, -7.5f),
+    //     glm::vec3(1.3f, -2.0f, -2.5f),
+    //     glm::vec3(1.5f, 2.0f, -2.5f),
+    //     glm::vec3(1.5f, 0.2f, -1.5f),
+    //     glm::vec3(-1.3f, 1.0f, -1.5f)
+    // };
 
     unsigned int vbo, vao;
     glGenVertexArrays(1, &vao);
@@ -205,6 +226,54 @@ int main() {
     glUseProgram(program);
     glUniform1i(glGetUniformLocation(program, "texture_t"), 0);
     // end of texture
+
+    // grid code
+    std::vector<float> grid_vertices;
+
+    for (int i = 0; i < 250; i++) {
+        grid_vertices.push_back(-i);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(-i);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(1000.0f);
+    }
+    for (int i = 0; i < 250; i++) {
+        grid_vertices.push_back(i);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(i);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(1000.0f);
+    }
+    for (int i = 0; i < 250; i++) {
+        grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(-i);
+        grid_vertices.push_back(1000.0f);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(-i);
+    }
+    for (int i = 0; i < 250; i++) {
+        grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(i);
+        grid_vertices.push_back(1000.0f);
+        grid_vertices.push_back(0.0f);
+        grid_vertices.push_back(i);
+    }
+
+    unsigned int grid_vao, grid_vbo;
+    glGenVertexArrays(1, &grid_vao);
+    glGenBuffers(1, &grid_vbo);
+
+    glBindVertexArray(grid_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, grid_vbo);
+    glBufferData(GL_ARRAY_BUFFER, grid_vertices.size() * sizeof(float), grid_vertices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+    // end of grid code
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -240,7 +309,7 @@ int main() {
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 
         glBindVertexArray(vao);
-        for (unsigned int i = 0; i < 1; i++) {
+        for (unsigned int i = 0; i < 256; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, positions[i]);
             // float angle = 20.0f * i;
@@ -249,6 +318,11 @@ int main() {
             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 5);
         }
+
+        // grid code
+        glBindVertexArray(grid_vao);
+        glDrawArrays(GL_LINES, 0, grid_vertices.size() / 2);
+        // end of grid code
 
         glfwSwapBuffers(window);
         glfwPollEvents();
