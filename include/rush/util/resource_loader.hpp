@@ -27,6 +27,9 @@ namespace util {
 
     void load_mesh(const std::string &filename, std::vector<float> &vertices);
 
+    void load_mesh_mtl(const std::string &filename, float &shininess, glm::vec3 &ambient, 
+        glm::vec3 &diffuse, glm::vec3 &specular, glm::vec3 &emissivity, float &density, float &transparency, int &illumination);
+
 } // namespace util
 
 #endif

@@ -60,7 +60,10 @@ void util::load_mesh(const std::string &filename, std::vector<float> &vertices) 
 
     std::string line;
     while (std::getline(file, line)) {
-        if (line.starts_with("v ")) {
+        if (line.starts_with("mtllib")) {
+            // use threads? 
+            
+        } else if (line.starts_with("v ")) {
             glm::vec3 vertex;
             sscanf(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
             vertices_t.push_back(vertex);
@@ -122,6 +125,40 @@ void util::load_mesh(const std::string &filename, std::vector<float> &vertices) 
             }
         }
     }
+
+    file.close();
+}
+
+void util::load_mesh_mtl(const std::string &filename, float &shininess, glm::vec3 &ambient, 
+    glm::vec3 &diffuse, glm::vec3 &specular, glm::vec3 &emissivity, float &density, float &transparency, int &illumination) {
+
+    std::ifstream file(filename);
+    if (!file) {
+        log_warn("mtl file: %s not found", filename.c_str()); return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.starts_with("Ns")) {
+            sscanf(line.c_str(), "Ns %f", &shininess);
+        } else if (line.starts_with("Ka")) {
+            sscanf(line.c_str(), "Ka %f %f %f", &ambient.x, &ambient.y, &ambient.z);
+        } else if (line.starts_with("Kd")) {
+            sscanf(line.c_str(), "Ka %f %f %f", &diffuse.x, &diffuse.y, &diffuse.z);
+        } else if (line.starts_with("Ks")) {
+            sscanf(line.c_str(), "Ka %f %f %f", &specular.x, &specular.y, &specular.z);
+        } else if (line.starts_with("Ke")) {
+            sscanf(line.c_str(), "Ke %f %f %f", &emissivity.x, &emissivity.y, &emissivity.z);
+        } else if (line.starts_with("Ni")) {
+            sscanf(line.c_str(), "Ni %f", &density);
+        } else if (line.starts_with("d")) {
+            sscanf(line.c_str(), "d %f", &transparency);
+        } else if (line.starts_with("illum")) {
+            sscanf(line.c_str(), "illum %d", &illumination);
+        }
+    }
+
+    file.close();
 }
 
 #pragma endregion Resource_Loader }
