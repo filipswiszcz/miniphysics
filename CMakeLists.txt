@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(rush VERSION 0.1.5)
+project(rush VERSION 0.1.7)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -13,22 +13,27 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.7.0)
 endif ()
 
 # collect all executables
+set(RUSH_CORE
+    src/core/renderer.cpp
+)
 set(RUSH_ENTITY
     src/entity/camera.cpp
     src/entity/entity.cpp
-)
-set(RUSH_CORE
-    # src/core/
+    src/entity/mesh.cpp
 )
 set(RUSH_UTIL
     src/util/log.c
     src/util/shader_loader.cpp
     src/util/resource_loader.cpp
 )
+set(RUSH_WORLD
+    src/world/terrain.cpp
+)
 set(SOURCES
     ${RUSH_ENTITY}
     ${RUSH_CORE}
     ${RUSH_UTIL}
+    ${RUSH_WORLD}
     src/main.cpp
 )
 

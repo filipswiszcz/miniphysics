@@ -75,6 +75,7 @@ void keyboard_input(GLFWwindow *window, entity::Camera &camera) {
         int k;
         GLFWmonitor **monitors = glfwGetMonitors(&k);
         GLFWmonitor *monitor = monitors[1];
+        // GLFWmonitor *monitor = monitors[0];
         const GLFWvidmode *mode = glfwGetVideoMode(monitor);
         if (IS_FULLSCREEN) {glfwSetWindowMonitor(window, nullptr, 0, 0, WIDTH, HEIGHT, mode -> refreshRate); IS_FULLSCREEN = false;}
         else {glfwSetWindowMonitor(window, monitor, 0, 0, mode -> width, mode -> height, mode -> refreshRate); IS_FULLSCREEN = true;}
@@ -133,7 +134,13 @@ int main() {
 
     // mesh code
     std::vector<float> vertices;
-    util::load_mesh("resources/models/sphere.obj", vertices);
+    util::load_mesh("resources/models/base_man.obj", vertices);
+
+    // float shininess, density, transparency;
+    // glm::vec3 ambient, diffuse, specular, emissivity;
+    // int illumination;
+
+    // util::load_mesh_mtl("resources/models/cube.mtl", shininess, ambient, diffuse, specular, emissivity, density, transparency, illumination);
     // end of mesh code
 
     // render with depth
@@ -229,38 +236,67 @@ int main() {
 
     // grid code
     std::vector<float> grid_vertices;
+    glm::vec3 grid_color(1.0f, 0.0f, 0.235f);
 
     for (int i = 0; i < 250; i++) {
         grid_vertices.push_back(-i);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
+
         grid_vertices.push_back(-i);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(1000.0f);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
     }
     for (int i = 0; i < 250; i++) {
         grid_vertices.push_back(i);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(-1000.0f);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
+
         grid_vertices.push_back(i);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(1000.0f);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
     }
     for (int i = 0; i < 250; i++) {
         grid_vertices.push_back(-1000.0f);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(-i);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
+
         grid_vertices.push_back(1000.0f);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(-i);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
     }
     for (int i = 0; i < 250; i++) {
         grid_vertices.push_back(-1000.0f);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(i);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
+
         grid_vertices.push_back(1000.0f);
         grid_vertices.push_back(0.0f);
         grid_vertices.push_back(i);
+        grid_vertices.push_back(grid_color.r);
+        grid_vertices.push_back(grid_color.g);
+        grid_vertices.push_back(grid_color.b);
     }
 
     unsigned int grid_vao, grid_vbo;
@@ -271,9 +307,37 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, grid_vbo);
     glBufferData(GL_ARRAY_BUFFER, grid_vertices.size() * sizeof(float), grid_vertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     // end of grid code
+
+    // another mesh code
+    std::vector<glm::vec3> mesh_vertices = {
+        glm::vec3(0.5f, 0.5f, 0.0f),
+        glm::vec3(0.5f, -0.5f, 0.0f),
+        glm::vec3(-0.5f, -0.5f, 0.0f),
+        glm::vec3(-0.5f, 0.5f, 0.0f)
+    };
+    std::vector<glm::vec3> mesh_normals = {
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f)
+    };
+    std::vector<glm::vec2> mesh_uvs = {
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(1.0f, 0.0f),
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(0.0f, 1.0f)
+    };
+
+    entity::Mesh mesh(mesh_vertices, mesh_uvs, mesh_normals);
+    mesh.set_shader_program(program);
+    mesh.set_texture(texture);
+    mesh.bind();
+    // end of antoher code
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -300,6 +364,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glUniform1i(glGetUniformLocation(program, "is_coloring"), 0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -309,7 +374,7 @@ int main() {
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 
         glBindVertexArray(vao);
-        for (unsigned int i = 0; i < 256; i++) {
+        for (unsigned int i = 0; i < 1; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, positions[i]);
             // float angle = 20.0f * i;
@@ -320,9 +385,15 @@ int main() {
         }
 
         // grid code
+        glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
         glBindVertexArray(grid_vao);
         glDrawArrays(GL_LINES, 0, grid_vertices.size() / 2);
         // end of grid code
+
+        // another mesh code
+        glUniform1i(glGetUniformLocation(program, "is_coloring"), 0);
+        mesh.draw();
+        // end of another mesh code
 
         glfwSwapBuffers(window);
         glfwPollEvents();
