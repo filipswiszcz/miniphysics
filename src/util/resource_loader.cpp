@@ -47,6 +47,73 @@ unsigned int util::temp_load_texture(const std::string &filename) {
     return texture;
 }
 
+void util::load_mesh_f(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals) {
+    std::vector<glm::vec3> t_vertices, t_normals;
+    std::vector<glm::vec2> t_uvs;
+
+    std::ifstream file(filename);
+    if (!file) {
+        log_warn("mesh file: %s not found", filename.c_str()); return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.starts_with("mtllib")) {
+            // use threads? 
+        } else if (line.starts_with("v ")) {
+            glm::vec3 vertex;
+            sscanf(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+            t_vertices.push_back(vertex);
+        } else if (line.starts_with("vn")) {
+            glm::vec3 normal;
+            sscanf(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
+            t_normals.push_back(normal);
+        } else if (line.starts_with("vt")) {
+            glm::vec2 uv;
+            sscanf(line.c_str(), "vt %f %f", &uv.x, &uv.y);
+            t_uvs.push_back(uv);
+        } else if (line.starts_with("f")) {
+            std::regex pattern("([a-z]) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+)");
+            std::smatch match;
+            if (!std::regex_match(line, match, pattern)) continue;
+            for (int i = 0; i < 11; i++) {
+                switch (i) {
+                    case 2: {
+                        vertices.push_back(t_vertices[std::stoi(match[2].str()) - 1]); break;
+                    }
+                    case 3: {
+                        normals.push_back(t_normals[std::stoi(match[3].str()) - 1]); break;
+                    }
+                    case 4: {
+                        uvs.push_back(t_uvs[std::stoi(match[4].str()) - 1]); break;
+                    }
+                    case 5: {
+                        vertices.push_back(t_vertices[std::stoi(match[5].str()) - 1]); break;
+                    }
+                    case 6: {
+                        normals.push_back(t_normals[std::stoi(match[6].str()) - 1]); break;
+                    }
+                    case 7: {
+                        uvs.push_back(t_uvs[std::stoi(match[7].str()) - 1]); break;
+                    }
+                    case 8: {
+                        vertices.push_back(t_vertices[std::stoi(match[8].str()) - 1]); break;
+                    }
+                    case 9: {
+                        normals.push_back(t_normals[std::stoi(match[9].str()) - 1]); break;
+                    }
+                    case 10: {
+                        uvs.push_back(t_uvs[std::stoi(match[10].str()) - 1]); break;
+                    }
+                    default: break;
+                }
+            }
+        }
+    }
+
+    log_debug("sizes %d %d %d", vertices.size(), uvs.size(), normals.size());
+}
+
 void util::load_mesh(const std::string &filename, std::vector<float> &vertices) {
     std::vector<glm::vec3> vertices_t, normals_t;
     std::vector<glm::vec2> uvs_t;

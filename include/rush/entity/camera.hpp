@@ -1,7 +1,7 @@
-#include <rush/entity/entity.hpp>
-
 #ifndef CAMERA_H
 #define CAMERA_H
+
+#include <rush/entity/entity.hpp>
 
 namespace entity {
 

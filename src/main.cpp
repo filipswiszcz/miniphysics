@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 
+#include <rush/core/renderer.hpp>
 #include <rush/entity/camera.hpp>
 #include <rush/entity/mesh.hpp>
 extern "C" {
@@ -134,7 +135,7 @@ int main() {
 
     // mesh code
     std::vector<float> vertices;
-    util::load_mesh("resources/models/base_man.obj", vertices);
+    // util::load_mesh("resources/models/base_man.obj", vertices);
 
     // float shininess, density, transparency;
     // glm::vec3 ambient, diffuse, specular, emissivity;
@@ -228,7 +229,8 @@ int main() {
 
     // texture
     // unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
-    unsigned int texture = util::temp_load_texture("resources/textures/fantasy_world_map.png");
+    // unsigned int texture = util::temp_load_texture("resources/textures/fantasy_world_map.png");
+    unsigned int texture = util::temp_load_texture("resources/textures/red_metal.jpg");
 
     glUseProgram(program);
     glUniform1i(glGetUniformLocation(program, "texture_t"), 0);
@@ -313,30 +315,38 @@ int main() {
     glEnableVertexAttribArray(2);
     // end of grid code
 
+    // renderer code
+    core::Renderer renderer;
+    // end of renderer code
+
     // another mesh code
-    std::vector<glm::vec3> mesh_vertices = {
-        glm::vec3(0.5f, 0.5f, 0.0f),
-        glm::vec3(0.5f, -0.5f, 0.0f),
-        glm::vec3(-0.5f, -0.5f, 0.0f),
-        glm::vec3(-0.5f, 0.5f, 0.0f)
-    };
-    std::vector<glm::vec3> mesh_normals = {
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(1.0f, 1.0f, 0.0f)
-    };
-    std::vector<glm::vec2> mesh_uvs = {
-        glm::vec2(1.0f, 1.0f),
-        glm::vec2(1.0f, 0.0f),
-        glm::vec2(0.0f, 0.0f),
-        glm::vec2(0.0f, 1.0f)
-    };
+    // std::vector<glm::vec3> mesh_vertices = {
+    //     glm::vec3(0.5f, 0.5f, 0.0f),
+    //     glm::vec3(0.5f, -0.5f, 0.0f),
+    //     glm::vec3(-0.5f, -0.5f, 0.0f),
+    //     glm::vec3(-0.5f, 0.5f, 0.0f)
+    // };
+    // std::vector<glm::vec2> mesh_uvs = {
+    //     glm::vec2(1.0f, 1.0f),
+    //     glm::vec2(1.0f, 0.0f),
+    //     glm::vec2(0.0f, 0.0f),
+    //     glm::vec2(0.0f, 1.0f)
+    // };
+    // std::vector<glm::vec3> mesh_normals = {
+    //     glm::vec3(1.0f, 0.0f, 0.0f),
+    //     glm::vec3(0.0f, 1.0f, 0.0f),
+    //     glm::vec3(0.0f, 0.0f, 1.0f),
+    //     glm::vec3(1.0f, 1.0f, 0.0f)
+    // };
+
+    std::vector<glm::vec3> mesh_vertices, mesh_normals;
+    std::vector<glm::vec2> mesh_uvs;
+    util::load_mesh_f("resources/models/base_man.obj", mesh_vertices, mesh_uvs, mesh_normals);
 
     entity::Mesh mesh(mesh_vertices, mesh_uvs, mesh_normals);
     mesh.set_shader_program(program);
     mesh.set_texture(texture);
-    mesh.bind();
+    renderer.add_mesh(mesh);
     // end of antoher code
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
@@ -381,7 +391,7 @@ int main() {
             // model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 5);
+            // glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 5);
         }
 
         // grid code
@@ -392,7 +402,7 @@ int main() {
 
         // another mesh code
         glUniform1i(glGetUniformLocation(program, "is_coloring"), 0);
-        mesh.draw();
+        renderer.draw();
         // end of another mesh code
 
         glfwSwapBuffers(window);

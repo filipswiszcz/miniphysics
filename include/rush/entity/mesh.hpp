@@ -19,6 +19,13 @@ namespace entity {
         glm::vec3 normal;
     };
 
+    struct Material {
+        std::string name;
+        float shininess;
+        glm::vec3 ambient, diffuse, specular, emissivity;
+        float density, transparency, illumination;
+    };
+
     class Mesh {
 
         private:

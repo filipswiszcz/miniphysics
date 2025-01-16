@@ -1,11 +1,11 @@
+#pragma mark - Camera
+#pragma region Camera {
+
 #include <iostream>
 
 #include <rush/entity/camera.hpp>
 
 #include <glm/glm.hpp>
-
-#pragma mark - Camera
-#pragma region Camera {
 
 glm::mat4 entity::Camera::get_look_at() {
     const glm::vec3 t(glm::normalize((this -> position + this -> target_position) - this -> position));
