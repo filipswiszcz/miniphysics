@@ -1,15 +1,20 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <iostream>
 #include <vector>
+
+extern "C" {
+    #include <rush/util/log.h>
+}
 
 #ifdef __APPLE__
     #define GL_SILENCE_DEPRECATION
     #define GLFW_INCLUDE_GLCOREARB
     #include <GLFW/glfw3.h>
 #endif
-
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace entity {
 

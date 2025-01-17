@@ -1,12 +1,7 @@
 #pragma mark - Mesh
 #pragma region Mesh {
 
-#include <iostream>
-
 #include <rush/entity/mesh.hpp>
-extern "C" {
-    #include <rush/util/log.h>
-}
 
 entity::Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec2> uvs, std::vector<glm::vec3> normals) {
     this -> vertices = vertices;
@@ -45,7 +40,7 @@ void entity::Mesh::bind() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void entity::Mesh::draw() {

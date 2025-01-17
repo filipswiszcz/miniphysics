@@ -89,6 +89,10 @@ void keyboard_input(GLFWwindow *window, entity::Camera &camera) {
         glfwSetWindowShouldClose(window, true);
 }
 
+void window_size_callback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 void frames_update(GLFWwindow *window) {
     float current_time = static_cast<float>(glfwGetTime());
     TIME_BETWEEN_FRAMES = current_time - TIME_OF_LAST_FRAME;
@@ -120,6 +124,7 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, window_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glEnable(GL_DEPTH_TEST);
@@ -135,7 +140,7 @@ int main() {
 
     // mesh code
     std::vector<float> vertices;
-    // util::load_mesh("resources/models/base_man.obj", vertices);
+    util::load_mesh("resources/models/sphere.obj", vertices);
 
     // float shininess, density, transparency;
     // glm::vec3 ambient, diffuse, specular, emissivity;
@@ -144,49 +149,56 @@ int main() {
     // util::load_mesh_mtl("resources/models/cube.mtl", shininess, ambient, diffuse, specular, emissivity, density, transparency, illumination);
     // end of mesh code
 
-    // render with depth
+    // light code
+    // std::string light_ver_shader_code = util::read_shader_file("shaders/light.vs");
+    // std::string light_frag_shader_code = util::read_shader_file("shaders/light.fs");
+    // GLuint light_ver_shader = util::compile_shader(light_ver_shader_code, GL_VERTEX_SHADER);
+    // GLuint light_frag_shader = util::compile_shader(light_frag_shader_code, GL_FRAGMENT_SHADER);
+
+    // GLuint light_shader_program = util::link_shaders(light_ver_shader, light_frag_shader);
+
     // float vertices[] = {
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    //      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f,
+    //      0.5f, -0.5f, -0.5f,
+    //      0.5f,  0.5f, -0.5f,
+    //      0.5f,  0.5f, -0.5f,
+    //     -0.5f,  0.5f, -0.5f,
+    //     -0.5f, -0.5f, -0.5f,
 
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f,  0.5f,
+    //      0.5f, -0.5f,  0.5f,
+    //      0.5f,  0.5f,  0.5f,
+    //      0.5f,  0.5f,  0.5f,
+    //     -0.5f,  0.5f,  0.5f,
+    //     -0.5f, -0.5f,  0.5f,
 
-    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,
+    //     -0.5f,  0.5f, -0.5f,
+    //     -0.5f, -0.5f, -0.5f,
+    //     -0.5f, -0.5f, -0.5f,
+    //     -0.5f, -0.5f,  0.5f,
+    //     -0.5f,  0.5f,  0.5f,
 
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,
+    //      0.5f,  0.5f, -0.5f,
+    //      0.5f, -0.5f, -0.5f,
+    //      0.5f, -0.5f, -0.5f,
+    //      0.5f, -0.5f,  0.5f,
+    //      0.5f,  0.5f,  0.5f,
 
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,
+    //      0.5f, -0.5f, -0.5f,
+    //      0.5f, -0.5f,  0.5f,
+    //      0.5f, -0.5f,  0.5f,
+    //     -0.5f, -0.5f,  0.5f,
+    //     -0.5f, -0.5f, -0.5f,
 
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    //     -0.5f,  0.5f, -0.5f,
+    //      0.5f,  0.5f, -0.5f,
+    //      0.5f,  0.5f,  0.5f,
+    //      0.5f,  0.5f,  0.5f,
+    //     -0.5f,  0.5f,  0.5f,
+    //     -0.5f,  0.5f, -0.5f
     // };
 
     glm::vec3 positions[256];
@@ -197,19 +209,6 @@ int main() {
         }
     }
 
-    // glm::vec3 positions[] = {
-    //     glm::vec3(0.0f, 0.0f, -3.0f),
-    //     glm::vec3(2.0f, 5.0f, -15.0f),
-    //     glm::vec3(-1.5f, -2.2f, -2.5f),
-    //     glm::vec3(-3.8f, -2.0f, -12.3f),
-    //     glm::vec3(2.4f, -0.4f, -3.5f),
-    //     glm::vec3(-1.7f, 3.0f, -7.5f),
-    //     glm::vec3(1.3f, -2.0f, -2.5f),
-    //     glm::vec3(1.5f, 2.0f, -2.5f),
-    //     glm::vec3(1.5f, 0.2f, -1.5f),
-    //     glm::vec3(-1.3f, 1.0f, -1.5f)
-    // };
-
     unsigned int vbo, vao;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -217,15 +216,15 @@ int main() {
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
+    
+    // end of light code
 
     // texture
     // unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
@@ -320,28 +319,9 @@ int main() {
     // end of renderer code
 
     // another mesh code
-    // std::vector<glm::vec3> mesh_vertices = {
-    //     glm::vec3(0.5f, 0.5f, 0.0f),
-    //     glm::vec3(0.5f, -0.5f, 0.0f),
-    //     glm::vec3(-0.5f, -0.5f, 0.0f),
-    //     glm::vec3(-0.5f, 0.5f, 0.0f)
-    // };
-    // std::vector<glm::vec2> mesh_uvs = {
-    //     glm::vec2(1.0f, 1.0f),
-    //     glm::vec2(1.0f, 0.0f),
-    //     glm::vec2(0.0f, 0.0f),
-    //     glm::vec2(0.0f, 1.0f)
-    // };
-    // std::vector<glm::vec3> mesh_normals = {
-    //     glm::vec3(1.0f, 0.0f, 0.0f),
-    //     glm::vec3(0.0f, 1.0f, 0.0f),
-    //     glm::vec3(0.0f, 0.0f, 1.0f),
-    //     glm::vec3(1.0f, 1.0f, 0.0f)
-    // };
-
     std::vector<glm::vec3> mesh_vertices, mesh_normals;
     std::vector<glm::vec2> mesh_uvs;
-    util::load_mesh_f("resources/models/base_man.obj", mesh_vertices, mesh_uvs, mesh_normals);
+    util::load_mesh_f("resources/models/sphere.obj", mesh_vertices, mesh_uvs, mesh_normals);
 
     entity::Mesh mesh(mesh_vertices, mesh_uvs, mesh_normals);
     mesh.set_shader_program(program);
@@ -374,7 +354,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUniform1i(glGetUniformLocation(program, "is_coloring"), 0);
+        glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -384,7 +364,7 @@ int main() {
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 
         glBindVertexArray(vao);
-        for (unsigned int i = 0; i < 1; i++) {
+        for (unsigned int i = 0; i < 256; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, positions[i]);
             // float angle = 20.0f * i;
