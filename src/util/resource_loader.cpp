@@ -47,7 +47,7 @@ unsigned int util::temp_load_texture(const std::string &filename) {
     return texture;
 }
 
-void util::load_mesh_f(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals) {
+void util::load_mesh(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals) {
     std::vector<glm::vec3> t_vertices, t_normals;
     std::vector<glm::vec2> t_uvs;
 
@@ -110,90 +110,6 @@ void util::load_mesh_f(const std::string &filename, std::vector<glm::vec3> &vert
             }
         }
     }
-
-    log_debug("sizes %d %d %d", vertices.size(), uvs.size(), normals.size());
-}
-
-void util::load_mesh(const std::string &filename, std::vector<float> &vertices) {
-    std::vector<glm::vec3> vertices_t, normals_t;
-    std::vector<glm::vec2> uvs_t;
-
-    std::vector<float> vertices_f;
-
-    std::ifstream file(filename);
-    if (!file) {
-        log_warn("mesh file: %s not found", filename.c_str()); return;
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.starts_with("mtllib")) {
-            // use threads? 
-            
-        } else if (line.starts_with("v ")) {
-            glm::vec3 vertex;
-            sscanf(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
-            vertices_t.push_back(vertex);
-        } else if (line.starts_with("vn")) {
-            glm::vec3 normal;
-            sscanf(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
-            normals_t.push_back(normal);
-        } else if (line.starts_with("vt")) {
-            glm::vec2 uv;
-            sscanf(line.c_str(), "vt %f %f", &uv.x, &uv.y);
-            uvs_t.push_back(uv);
-        } else if (line.starts_with("f")) {
-            std::regex pattern("([a-z]) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+)");
-            std::smatch match;
-            if (!std::regex_match(line, match, pattern)) continue;
-            for (int i = 0; i < 10; i++) {
-                switch (i) {
-                    case 2: {
-                        glm::vec3 *velem_a = &vertices_t[std::stoi(match[2].str()) - 1];
-                        vertices.push_back(velem_a -> x);
-                        vertices.push_back(velem_a -> y);
-                        vertices.push_back(velem_a -> z);
-                        break;
-                    }
-                    case 3: {
-                        glm::vec2 *uelem_a = &uvs_t[std::stoi(match[3].str()) - 1];
-                        vertices.push_back(uelem_a -> x);
-                        vertices.push_back(uelem_a -> y);
-                        break;
-                    }
-                    case 5: {
-                        glm::vec3 *velem_b = &vertices_t[std::stoi(match[5].str()) - 1];
-                        vertices.push_back(velem_b -> x);
-                        vertices.push_back(velem_b -> y);
-                        vertices.push_back(velem_b -> z);
-                        break;
-                    }
-                    case 6: {
-                        glm::vec2 *uelem_b = &uvs_t[std::stoi(match[6].str()) - 1];
-                        vertices.push_back(uelem_b -> x);
-                        vertices.push_back(uelem_b -> y);
-                        break;
-                    }
-                    case 8: {
-                        glm::vec3 *velem_c = &vertices_t[std::stoi(match[8].str()) - 1];
-                        vertices.push_back(velem_c -> x);
-                        vertices.push_back(velem_c -> y);
-                        vertices.push_back(velem_c -> z);
-                        break;
-                    }
-                    case 9: {
-                        glm::vec2 *uelem_c = &uvs_t[std::stoi(match[9].str()) - 1];
-                        vertices.push_back(uelem_c -> x);
-                        vertices.push_back(uelem_c -> y);
-                        break;
-                    }
-                    default: break;
-                }
-            }
-        }
-    }
-
-    file.close();
 }
 
 void util::load_mesh_mtl(const std::string &filename, float &shininess, glm::vec3 &ambient, 

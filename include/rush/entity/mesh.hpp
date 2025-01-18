@@ -51,9 +51,19 @@ namespace entity {
 
             ~Mesh();
 
-            void bind();
+            std::vector<glm::vec3> get_vertices() const {return vertices;}
 
-            void draw();
+            std::vector<glm::vec3> get_normals() const {return normals;}
+
+            std::vector<glm::vec2> get_uvs() const {return uvs;}
+
+            unsigned int &get_vao() {return vao;}
+
+            unsigned int &get_vbo() {return vbo;}
+
+            unsigned int &get_ebo() {return ebo;}
+
+            unsigned int get_shader_program() const {return shader_program;}
 
             void set_shader_program(const unsigned int program);
 

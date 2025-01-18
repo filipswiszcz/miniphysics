@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <rush/entity/mesh.hpp>
+#include <rush/core/scene.hpp>
 extern "C" {
     #include <rush/util/log.h>
 }
@@ -21,19 +21,23 @@ namespace core {
 
         private:
 
-            std::vector<std::shared_ptr<entity::Mesh>> meshes;
+            std::vector<std::shared_ptr<core::Scene>> scenes;
 
         public:
 
-            Renderer();
+            Renderer() = default;
 
-            ~Renderer();
+            ~Renderer() = default;
+
+            void bind();
 
             void draw();
 
             void release();
 
-            void add_mesh(const entity::Mesh mesh);
+            void add_scene(const std::shared_ptr<core::Scene> &scene);
+
+            void remove_scene(const std::shared_ptr<core::Scene> &scene);
 
     };
 

@@ -7,20 +7,26 @@
 namespace entity {
 
     enum Type {
-
+        
     };
 
     class Object : public Entity {
 
-            entity::Mesh mesh;
+            std::shared_ptr<entity::Mesh> mesh;
 
-            bool is_visible = true;
+            bool visible = true;
 
         public:
 
-            entity::Mesh get_mesh() {return mesh;}
+            Object() = default;
 
-            void set_mesh(const entity::Mesh mesh);
+            std::shared_ptr<entity::Mesh> get_mesh() const {return mesh;}
+
+            void set_mesh(const std::shared_ptr<entity::Mesh> &mesh);
+
+            bool is_visible() const {return visible;}
+
+            void set_visible(const bool state);
 
     };
 

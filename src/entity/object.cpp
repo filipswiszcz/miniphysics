@@ -8,8 +8,12 @@
 #include <glm/glm.hpp>
 
 
-void entity::Object::set_mesh(const entity::Mesh mesh) {
+void entity::Object::set_mesh(const std::shared_ptr<entity::Mesh> &mesh) {
     this -> mesh = mesh;
+}
+
+void entity::Object::set_visible(const bool state) {
+    this -> visible = state;
 }
 
 #pragma endregion Object }

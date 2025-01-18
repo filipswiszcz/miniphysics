@@ -2,6 +2,7 @@
 #include <vector>
 
 #include <rush/core/renderer.hpp>
+#include <rush/core/scene.hpp>
 #include <rush/entity/camera.hpp>
 #include <rush/entity/mesh.hpp>
 extern "C" {
@@ -138,10 +139,7 @@ int main() {
     GLuint program = util::link_shaders(vertex_shader, frag_shader);
     // end of shader code
 
-    // mesh code
-    std::vector<float> vertices;
-    util::load_mesh("resources/models/sphere.obj", vertices);
-
+    // mtl code
     // float shininess, density, transparency;
     // glm::vec3 ambient, diffuse, specular, emissivity;
     // int illumination;
@@ -157,50 +155,6 @@ int main() {
 
     // GLuint light_shader_program = util::link_shaders(light_ver_shader, light_frag_shader);
 
-    // float vertices[] = {
-    //     -0.5f, -0.5f, -0.5f,
-    //      0.5f, -0.5f, -0.5f,
-    //      0.5f,  0.5f, -0.5f,
-    //      0.5f,  0.5f, -0.5f,
-    //     -0.5f,  0.5f, -0.5f,
-    //     -0.5f, -0.5f, -0.5f,
-
-    //     -0.5f, -0.5f,  0.5f,
-    //      0.5f, -0.5f,  0.5f,
-    //      0.5f,  0.5f,  0.5f,
-    //      0.5f,  0.5f,  0.5f,
-    //     -0.5f,  0.5f,  0.5f,
-    //     -0.5f, -0.5f,  0.5f,
-
-    //     -0.5f,  0.5f,  0.5f,
-    //     -0.5f,  0.5f, -0.5f,
-    //     -0.5f, -0.5f, -0.5f,
-    //     -0.5f, -0.5f, -0.5f,
-    //     -0.5f, -0.5f,  0.5f,
-    //     -0.5f,  0.5f,  0.5f,
-
-    //      0.5f,  0.5f,  0.5f,
-    //      0.5f,  0.5f, -0.5f,
-    //      0.5f, -0.5f, -0.5f,
-    //      0.5f, -0.5f, -0.5f,
-    //      0.5f, -0.5f,  0.5f,
-    //      0.5f,  0.5f,  0.5f,
-
-    //     -0.5f, -0.5f, -0.5f,
-    //      0.5f, -0.5f, -0.5f,
-    //      0.5f, -0.5f,  0.5f,
-    //      0.5f, -0.5f,  0.5f,
-    //     -0.5f, -0.5f,  0.5f,
-    //     -0.5f, -0.5f, -0.5f,
-
-    //     -0.5f,  0.5f, -0.5f,
-    //      0.5f,  0.5f, -0.5f,
-    //      0.5f,  0.5f,  0.5f,
-    //      0.5f,  0.5f,  0.5f,
-    //     -0.5f,  0.5f,  0.5f,
-    //     -0.5f,  0.5f, -0.5f
-    // };
-
     glm::vec3 positions[256];
     unsigned int index = 0;
     for (int i = 0; i < 16; i++) {
@@ -209,17 +163,17 @@ int main() {
         }
     }
 
-    unsigned int vbo, vao;
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    // unsigned int vbo, vao;
+    // glGenVertexArrays(1, &vao);
+    // glGenBuffers(1, &vbo);
 
-    glBindVertexArray(vao);
+    // glBindVertexArray(vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-    glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    // glEnableVertexAttribArray(0);
 
     // glBindBuffer(GL_ARRAY_BUFFER, 0);
     // glBindVertexArray(0);
@@ -321,19 +275,30 @@ int main() {
     // another mesh code
     std::vector<glm::vec3> mesh_vertices, mesh_normals;
     std::vector<glm::vec2> mesh_uvs;
-    util::load_mesh_f("resources/models/sphere.obj", mesh_vertices, mesh_uvs, mesh_normals);
+    util::load_mesh("resources/models/sphere.obj", mesh_vertices, mesh_uvs, mesh_normals);
 
     entity::Mesh mesh(mesh_vertices, mesh_uvs, mesh_normals);
     mesh.set_shader_program(program);
     mesh.set_texture(texture);
-    renderer.add_mesh(mesh);
+    std::shared_ptr<entity::Mesh> shared_mesh = std::make_shared<entity::Mesh>(mesh);
+
+    core::Scene scene;
+    for (int i = 0; i < 16; i++) {
+        entity::Object sphere;
+        sphere.set_position(positions[i]);
+        sphere.set_mesh(shared_mesh);
+        scene.add_object(std::make_shared<entity::Object>(sphere));
+    }
+    scene.bind();
+
+    renderer.add_scene(std::make_shared<core::Scene>(scene));
     // end of antoher code
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
 
     entity::Camera camera;
-    camera.set_position(glm::vec3(0.0f, 0.0f, 3.0f));
+    camera.set_position(glm::vec3(0.0f, 1.0f, 3.0f));
     camera.set_target_position(glm::vec3(0.0f, 0.0f, -1.0f));
     camera.set_up_position(glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -354,7 +319,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
+        // glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -362,17 +327,20 @@ int main() {
 
         glm::mat4 view = camera.get_look_at();
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
-
-        glBindVertexArray(vao);
-        for (unsigned int i = 0; i < 256; i++) {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, positions[i]);
+        // glm::mat4 model = glm::mat4(1.0f);
+        // model = glm::translate(model, positions[0]);
+        // glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
+        
+        // glBindVertexArray(vao);
+        // for (unsigned int i = 0; i < 256; i++) {
+        //     glm::mat4 model = glm::mat4(1.0f);
+        //     model = glm::translate(model, positions[i]);
             // float angle = 20.0f * i;
             // model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
+            // glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             // glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 5);
-        }
+        // }
 
         // grid code
         glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
@@ -389,8 +357,8 @@ int main() {
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &grid_vao);
+    glDeleteBuffers(1, &grid_vbo);
     glDeleteProgram(program);
     glfwTerminate();
 

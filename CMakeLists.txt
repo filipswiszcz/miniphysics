@@ -15,16 +15,18 @@ endif ()
 # collect all executables
 set(RUSH_CORE
     src/core/renderer.cpp
+    src/core/scene.cpp
 )
 set(RUSH_ENTITY
     src/entity/camera.cpp
     src/entity/entity.cpp
     src/entity/mesh.cpp
+    src/entity/object.cpp
 )
 set(RUSH_UTIL
     src/util/log.c
-    src/util/shader_loader.cpp
     src/util/resource_loader.cpp
+    src/util/shader_loader.cpp
 )
 set(RUSH_WORLD
     src/world/terrain.cpp
