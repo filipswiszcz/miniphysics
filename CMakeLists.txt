@@ -16,6 +16,7 @@ endif ()
 set(RUSH_CORE
     src/core/renderer.cpp
     src/core/scene.cpp
+    src/core/shader.cpp
 )
 set(RUSH_ENTITY
     src/entity/camera.cpp

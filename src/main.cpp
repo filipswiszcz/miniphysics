@@ -3,6 +3,7 @@
 
 #include <rush/core/renderer.hpp>
 #include <rush/core/scene.hpp>
+#include <rush/core/shader.hpp>
 #include <rush/entity/camera.hpp>
 #include <rush/entity/mesh.hpp>
 extern "C" {
@@ -131,12 +132,15 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // shader code
-    std::string vertex_shader_code = util::read_shader_file("shaders/basic.vs");
-    std::string frag_shader_code = util::read_shader_file("shaders/basic.fs");
-    GLuint vertex_shader = util::compile_shader(vertex_shader_code, GL_VERTEX_SHADER);
-    GLuint frag_shader = util::compile_shader(frag_shader_code, GL_FRAGMENT_SHADER);
+    core::Shader shader("shaders/basic.vs", "shaders/basic.fs");
 
-    GLuint program = util::link_shaders(vertex_shader, frag_shader);
+
+    // std::string vertex_shader_code = util::read_shader_file("shaders/basic.vs");
+    // std::string frag_shader_code = util::read_shader_file("shaders/basic.fs");
+    // GLuint vertex_shader = util::compile_shader(vertex_shader_code, GL_VERTEX_SHADER);
+    // GLuint frag_shader = util::compile_shader(frag_shader_code, GL_FRAGMENT_SHADER);
+
+    // GLuint program = util::link_shaders(vertex_shader, frag_shader);
     // end of shader code
 
     // mtl code
@@ -185,8 +189,8 @@ int main() {
     // unsigned int texture = util::temp_load_texture("resources/textures/fantasy_world_map.png");
     unsigned int texture = util::temp_load_texture("resources/textures/red_metal.jpg");
 
-    glUseProgram(program);
-    glUniform1i(glGetUniformLocation(program, "texture_t"), 0);
+    // glUseProgram(program);
+    glUniform1i(glGetUniformLocation(shader.get_id(), "texture_t"), 0); // here
     // end of texture
 
     // grid code
@@ -278,24 +282,27 @@ int main() {
     util::load_mesh("resources/models/sphere.obj", mesh_vertices, mesh_uvs, mesh_normals);
 
     entity::Mesh mesh(mesh_vertices, mesh_uvs, mesh_normals);
-    mesh.set_shader_program(program);
+    mesh.set_shader_program(shader.get_id()); // here
     mesh.set_texture(texture);
     std::shared_ptr<entity::Mesh> shared_mesh = std::make_shared<entity::Mesh>(mesh);
 
+    entity::Object sphere;
+    sphere.set_position(positions[0]);
+    sphere.set_mesh(shared_mesh);
+
     core::Scene scene;
-    for (int i = 0; i < 16; i++) {
-        entity::Object sphere;
-        sphere.set_position(positions[i]);
-        sphere.set_mesh(shared_mesh);
-        scene.add_object(std::make_shared<entity::Object>(sphere));
-    }
+    scene.add_object(std::make_shared<entity::Object>(sphere));
     scene.bind();
 
     renderer.add_scene(std::make_shared<core::Scene>(scene));
     // end of antoher code
 
+    // infinite grid code
+
+    // end of infinite grid code
+
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
-    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(shader.get_id(), "projection"), 1, GL_FALSE, &projection[0][0]); // here
 
     entity::Camera camera;
     camera.set_position(glm::vec3(0.0f, 1.0f, 3.0f));
@@ -323,10 +330,10 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        glUseProgram(program);
+        glUseProgram(shader.get_id()); // here
 
         glm::mat4 view = camera.get_look_at();
-        glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(shader.get_id(), "view"), 1, GL_FALSE, &view[0][0]); // here
         // glm::mat4 model = glm::mat4(1.0f);
         // model = glm::translate(model, positions[0]);
         // glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
@@ -343,13 +350,13 @@ int main() {
         // }
 
         // grid code
-        glUniform1i(glGetUniformLocation(program, "is_coloring"), 1);
+        glUniform1i(glGetUniformLocation(shader.get_id(), "is_coloring"), 1); // here
         glBindVertexArray(grid_vao);
         glDrawArrays(GL_LINES, 0, grid_vertices.size() / 2);
         // end of grid code
 
         // another mesh code
-        glUniform1i(glGetUniformLocation(program, "is_coloring"), 0);
+        glUniform1i(glGetUniformLocation(shader.get_id(), "is_coloring"), 0); // here
         renderer.draw();
         // end of another mesh code
 
@@ -359,7 +366,6 @@ int main() {
 
     glDeleteVertexArrays(1, &grid_vao);
     glDeleteBuffers(1, &grid_vbo);
-    glDeleteProgram(program);
     glfwTerminate();
 
     return 0;
