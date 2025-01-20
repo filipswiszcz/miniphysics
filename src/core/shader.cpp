@@ -83,7 +83,23 @@ void core::Shader::bind() {
     glUseProgram(this -> id);
 }
 
-void core::Shader::set_mat4(const std::string &name, const unsigned int &count, const bool &transpose, const float *mat) {
+void core::Shader::set_num(const std::string &name, const unsigned int &value) {
+    this -> bind(); glUniform1ui(this -> get_uniform_location(name), value);
+}
+
+void core::Shader::set_num(const std::string &name, const int &value) {
+    this -> bind(); glUniform1i(this -> get_uniform_location(name), value);
+}
+
+void core::Shader::set_num(const std::string &name, const float &value) {
+    this -> bind(); glUniform1f(this -> get_uniform_location(name), value);
+}
+
+void core::Shader::set_num(const std::string &name, const unsigned int &count, const float *value) {
+    this -> bind(); glUniform1fv(this -> get_uniform_location(name), count, value);
+}
+
+void core::Shader::set_mat4(const std::string &name, const float *mat, const unsigned int &count = 1, const bool &transpose = false) {
     this -> bind(); glUniformMatrix4fv(this -> get_uniform_location(name), count, (transpose ? GL_TRUE : GL_FALSE), mat);
 }
 

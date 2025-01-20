@@ -38,7 +38,15 @@ namespace core {
 
             void bind();
 
-            void set_mat4(const std::string &name, const unsigned int &count, const bool &transpose, const float *mat);
+            void set_num(const std::string &name, const unsigned int &value);
+
+            void set_num(const std::string &name, const int &value);
+
+            void set_num(const std::string &name, const float &value);
+
+            void set_num(const std::string &name, const unsigned int &count, const float *value);
+
+            void set_mat4(const std::string &name, const float *mat, const unsigned int &count = 1, const bool &transpose = false);
 
             unsigned int get_id() {return id;}
 
