@@ -30,6 +30,7 @@ set(RUSH_UTIL
     src/util/shader_loader.cpp
 )
 set(RUSH_WORLD
+    src/world/grid.cpp
     src/world/terrain.cpp
 )
 set(SOURCES
