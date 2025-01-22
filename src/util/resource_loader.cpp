@@ -47,7 +47,48 @@ unsigned int util::temp_load_texture(const std::string &filename) {
     return texture;
 }
 
-void util::load_mesh(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals) {
+entity::Mesh util::load_mesh(const std::string &filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        log_warn("mesh file: %s not found", filename.c_str()); return entity::Mesh({}, {});
+    }
+
+    std::vector<float> vertices;
+    std::vector<uint32_t> indices;
+
+    entity::Material material;
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.starts_with("v ")) {
+            float x, y, z;
+            sscanf(line.c_str(), "v %f %f %f", &x, &y, &z);
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+        } else if (line.starts_with("f")) {
+            std::regex pattern("([a-z]) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+)/(\\d+)");
+            std::smatch match;
+            if (!std::regex_match(line, match, pattern)) continue;
+            else {
+                indices.push_back(std::stoi(match[2].str()));
+                indices.push_back(std::stoi(match[5].str()));
+                indices.push_back(std::stoi(match[8].str()));
+            }
+        } else if ("mtllib") {
+            std::string mtl_filename;
+            sscanf(line.c_str(), "mtllib %s", mtl_filename.c_str());
+            material = load_mesh_material("resources/models/" + mtl_filename);
+        } else continue;
+    }
+
+    entity::Mesh mesh(vertices, indices);
+    mesh.set_material(material);
+
+    return mesh;
+}
+
+void util::load_mesh_p(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals) {
     std::vector<glm::vec3> t_vertices, t_normals;
     std::vector<glm::vec2> t_uvs;
 
@@ -112,36 +153,36 @@ void util::load_mesh(const std::string &filename, std::vector<glm::vec3> &vertic
     }
 }
 
-void util::load_mesh_mtl(const std::string &filename, float &shininess, glm::vec3 &ambient, 
-    glm::vec3 &diffuse, glm::vec3 &specular, glm::vec3 &emissivity, float &density, float &transparency, int &illumination) {
-
+entity::Material util::load_mesh_material(const std::string &filename) {
     std::ifstream file(filename);
     if (!file) {
-        log_warn("mtl file: %s not found", filename.c_str()); return;
+        log_warn("mtl file: %s not found", filename.c_str()); return entity::Material();
     }
+
+    entity::Material material;
 
     std::string line;
     while (std::getline(file, line)) {
         if (line.starts_with("Ns")) {
-            sscanf(line.c_str(), "Ns %f", &shininess);
+            sscanf(line.c_str(), "Ns %f", &material.shininess);
         } else if (line.starts_with("Ka")) {
-            sscanf(line.c_str(), "Ka %f %f %f", &ambient.x, &ambient.y, &ambient.z);
+            sscanf(line.c_str(), "Ka %f %f %f", &material.ambient.x, &material.ambient.y, &material.ambient.z);
         } else if (line.starts_with("Kd")) {
-            sscanf(line.c_str(), "Ka %f %f %f", &diffuse.x, &diffuse.y, &diffuse.z);
+            sscanf(line.c_str(), "Ka %f %f %f", &material.diffuse.x, &material.diffuse.y, &material.diffuse.z);
         } else if (line.starts_with("Ks")) {
-            sscanf(line.c_str(), "Ka %f %f %f", &specular.x, &specular.y, &specular.z);
+            sscanf(line.c_str(), "Ka %f %f %f", &material.specular.x, &material.specular.y, &material.specular.z);
         } else if (line.starts_with("Ke")) {
-            sscanf(line.c_str(), "Ke %f %f %f", &emissivity.x, &emissivity.y, &emissivity.z);
+            sscanf(line.c_str(), "Ke %f %f %f", &material.emissivity.x, &material.emissivity.y, &material.emissivity.z);
         } else if (line.starts_with("Ni")) {
-            sscanf(line.c_str(), "Ni %f", &density);
+            sscanf(line.c_str(), "Ni %f", &material.density);
         } else if (line.starts_with("d")) {
-            sscanf(line.c_str(), "d %f", &transparency);
+            sscanf(line.c_str(), "d %f", &material.transparency);
         } else if (line.starts_with("illum")) {
-            sscanf(line.c_str(), "illum %d", &illumination);
+            sscanf(line.c_str(), "illum %d", &material.illumination);
         }
     }
 
-    file.close();
+    return material;
 }
 
 #pragma endregion Resource_Loader }

@@ -28,48 +28,77 @@ namespace entity {
         std::string name;
         float shininess;
         glm::vec3 ambient, diffuse, specular, emissivity;
-        float density, transparency, illumination;
+        float density, transparency;
+        int illumination;
     };
 
     class Mesh {
 
         private:
 
-            std::vector<glm::vec3> vertices, normals;
-            std::vector<glm::vec2> uvs;
-            std::vector<unsigned int> indices;
+            uint16_t id;
+            
+            std::vector<float> vertices;
+            std::vector<uint32_t> indices;
 
-            std::vector<glm::vec3> colors;
-
-            unsigned int vao, vbo, ebo;
-
-            unsigned int shader_program, texture;
+            entity::Material material;
 
         public:
 
-            Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec2> uvs, std::vector<glm::vec3> normals);
+            Mesh(const std::vector<float> &vertices, const std::vector<uint32_t> &indices);
+            ~Mesh() = default;
 
-            ~Mesh();
+            uint16_t get_id() const {return id;}
 
-            std::vector<glm::vec3> get_vertices() const {return vertices;}
+            std::vector<float> get_vertices() const {return vertices;}
 
-            std::vector<glm::vec3> get_normals() const {return normals;}
+            std::vector<uint32_t> get_indices() const {return indices;}
 
-            std::vector<glm::vec2> get_uvs() const {return uvs;}
+            entity::Material get_material() const {return material;}
 
-            unsigned int &get_vao() {return vao;}
-
-            unsigned int &get_vbo() {return vbo;}
-
-            unsigned int &get_ebo() {return ebo;}
-
-            unsigned int get_shader_program() const {return shader_program;}
-
-            void set_shader_program(const unsigned int program);
-
-            void set_texture(const unsigned int texture);
+            void set_material(const entity::Material &material);
 
     };
+
+    // class Mesh {
+
+    //     private:
+
+    //         std::vector<glm::vec3> vertices, normals;
+    //         std::vector<glm::vec2> uvs;
+    //         std::vector<unsigned int> indices;
+
+    //         std::vector<glm::vec3> colors;
+
+    //         unsigned int vao, vbo, ebo;
+
+    //         unsigned int shader_program, texture;
+
+    //     public:
+
+    //         Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec2> uvs, std::vector<glm::vec3> normals);
+
+    //         ~Mesh();
+
+    //         std::vector<glm::vec3> get_vertices() const {return vertices;}
+
+    //         std::vector<glm::vec3> get_normals() const {return normals;}
+
+    //         std::vector<glm::vec2> get_uvs() const {return uvs;}
+
+    //         unsigned int &get_vao() {return vao;}
+
+    //         unsigned int &get_vbo() {return vbo;}
+
+    //         unsigned int &get_ebo() {return ebo;}
+
+    //         unsigned int get_shader_program() const {return shader_program;}
+
+    //         void set_shader_program(const unsigned int program);
+
+    //         void set_texture(const unsigned int texture);
+
+    // };
 
 } // namespace entity
 

@@ -7,6 +7,7 @@
 #include <regex>
 #include <vector>
 
+#include <rush/entity/mesh.hpp>
 extern "C" {
     #include <rush/util/log.h>
 }
@@ -25,10 +26,11 @@ namespace util {
 
     unsigned int temp_load_texture(const std::string &filename);
 
-    void load_mesh(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals);
+    void load_mesh_p(const std::string &filename, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals);
 
-    void load_mesh_mtl(const std::string &filename, float &shininess, glm::vec3 &ambient, 
-        glm::vec3 &diffuse, glm::vec3 &specular, glm::vec3 &emissivity, float &density, float &transparency, int &illumination);
+    entity::Mesh load_mesh(const std::string &filename);
+
+    entity::Material load_mesh_material(const std::string &filename);
 
 } // namespace util
 
