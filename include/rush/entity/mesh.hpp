@@ -32,6 +32,12 @@ namespace entity {
         int illumination;
     };
 
+    struct Model {
+        std::string filepath;
+        std::string name;
+        std::vector<uint16_t> mesh_ids;
+    };
+
     class Mesh {
 
         private:
@@ -41,7 +47,9 @@ namespace entity {
             std::vector<float> vertices;
             std::vector<uint32_t> indices;
 
-            entity::Material material;
+            entity::Material material; // switch it to id
+
+            uint32_t vao, vbo, ebo;
 
         public:
 
@@ -51,12 +59,17 @@ namespace entity {
             uint16_t get_id() const {return id;}
 
             std::vector<float> get_vertices() const {return vertices;}
-
             std::vector<uint32_t> get_indices() const {return indices;}
 
             entity::Material get_material() const {return material;}
-
             void set_material(const entity::Material &material);
+
+            uint32_t &get_vao() {return vao;}
+            void set_vao(const uint32_t vao);
+            uint32_t &get_vbo() {return vbo;}
+            void set_vbo(const uint32_t vbo);
+            uint32_t &get_ebo() {return ebo;}
+            void set_ebo(const uint32_t ebo);
 
     };
 

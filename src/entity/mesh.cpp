@@ -3,13 +3,27 @@
 
 #include <rush/entity/mesh.hpp>
 
-entity::Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec2> uvs, std::vector<glm::vec3> normals) {
+
+entity::Mesh::Mesh(const std::vector<float> &vertices, const std::vector<uint32_t> &indices) {
     this -> vertices = vertices;
-    this -> uvs = uvs;
-    this -> normals = normals;
+    this -> indices = indices;
 }
 
-entity::Mesh::~Mesh() {}
+void entity::Mesh::set_material(const entity::Material &material) {
+    this -> material = material;
+}
+
+void entity::Mesh::set_vao(const uint32_t vao) {
+    this -> vao = vao;
+}
+
+void entity::Mesh::set_vbo(const uint32_t vbo) {
+    this -> vbo = vbo;
+}
+
+void entity::Mesh::set_ebo(const uint32_t ebo) {
+    this -> ebo = ebo;
+}
 
 // void entity::Mesh::bind() {
 //     std::vector<entity::Vertex> uninted_vertices;
@@ -56,12 +70,12 @@ entity::Mesh::~Mesh() {}
 //     glBindVertexArray(0);
 // }
 
-void entity::Mesh::set_shader_program(const unsigned int program) {
-    this -> shader_program = program;
-}
+// void entity::Mesh::set_shader_program(const unsigned int program) {
+//     this -> shader_program = program;
+// }
 
-void entity::Mesh::set_texture(const unsigned int texture) {
-    this -> texture = texture;
-}
+// void entity::Mesh::set_texture(const unsigned int texture) {
+//     this -> texture = texture;
+// }
 
 #pragma endregion Mesh }
