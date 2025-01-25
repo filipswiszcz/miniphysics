@@ -3,7 +3,8 @@
 
 #include <vector>
 
-#include <rush/entity/object.hpp>
+#include <rush/mem/object_repository.hpp>
+#include <rush/object/mesh.hpp>
 
 namespace core {
 
@@ -11,28 +12,27 @@ namespace core {
 
         private:
 
-            std::vector<std::shared_ptr<entity::Object>> objects;
+            std::vector<uint16_t> meshes_ids;
 
-            std::vector<entity::Vertex> vertices;
-            unsigned int vao, vbo, ebo;
-
+            bool coolored = false;
             bool visible = false;
+
+            glm::vec3 gravity;
 
         public:
 
             Scene() = default;
-
             ~Scene() = default;
 
-            void bind();
+            void bind(const mem::Repository &repository);
 
             void update();
 
-            void draw();
+            void draw(const mem::Repository &repository);
 
-            void add_object(const std::shared_ptr<entity::Object> &object);
+            void add_mesh_id(const uint16_t id);
 
-            void remove_object(const std::shared_ptr<entity::Object> &object);
+            // void remove_object(const std::shared_ptr<entity::Object> &object);
 
     };
 

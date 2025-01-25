@@ -4,16 +4,18 @@
 #include <rush/core/renderer.hpp>
 
 
+core::Renderer::Renderer() : repository() {}
+
 void core::Renderer::bind() {
     // decide which scene
     for (const auto &scene : this -> scenes) {
-        scene -> bind();
+        // scene -> bind(this -> repository);
     }
 }
 
 void core::Renderer::draw() {
     for (const auto &scene : this -> scenes) {
-        scene -> draw();
+        // scene -> draw(this -> repository);
     }
 }
 

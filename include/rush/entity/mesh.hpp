@@ -15,6 +15,7 @@ extern "C" {
 #endif
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace entity {
 
@@ -71,6 +72,18 @@ namespace entity {
             uint32_t &get_ebo() {return ebo;}
             void set_ebo(const uint32_t ebo);
 
+    };
+
+    struct Transformation {
+        glm::vec3 scale;
+        glm::vec3 rotation_origin;
+        glm::quat rotation;
+        glm::vec3 translation;
+    };
+
+    struct Instance {
+        uint16_t mesh_id;
+        uint16_t transform_id;
     };
 
     // class Mesh {

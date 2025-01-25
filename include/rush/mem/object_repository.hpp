@@ -23,7 +23,7 @@ namespace mem {
             Repository() = default;
             ~Repository() = default;
 
-            object::Mesh get_mesh(const uint16_t id) {return meshes[id];}
+            object::Mesh get_mesh(const uint16_t id) const {return meshes.at(id);}
             void add_mesh(const object::Mesh &mesh);
 
     };

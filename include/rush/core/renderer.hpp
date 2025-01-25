@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <rush/core/scene.hpp>
+#include <rush/mem/object_repository.hpp>
 extern "C" {
     #include <rush/util/log.h>
 }
@@ -21,11 +22,13 @@ namespace core {
 
         private:
 
+            mem::Repository repository;
+
             std::vector<std::shared_ptr<core::Scene>> scenes;
 
         public:
 
-            Renderer() = default;
+            Renderer();
 
             ~Renderer() = default;
 

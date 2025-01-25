@@ -18,6 +18,9 @@ set(RUSH_CORE
     src/core/scene.cpp
     src/core/shader.cpp
 )
+set(RUSH_MEM
+    src/mem/object_repository.cpp
+)
 set(RUSH_ENTITY
     src/entity/camera.cpp
     src/entity/entity.cpp
@@ -30,8 +33,8 @@ set(RUSH_UTIL
     src/util/shader_loader.cpp
 )
 set(RUSH_WORLD
-    src/world/grid.cpp
-    src/world/terrain.cpp
+    # src/world/grid.cpp
+    # src/world/terrain.cpp
 )
 set(SOURCES
     ${RUSH_ENTITY}
