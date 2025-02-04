@@ -76,9 +76,10 @@ entity::Mesh util::load_mesh(const std::string &filename) {
                 indices.push_back(std::stoi(match[8].str()));
             }
         } else if ("mtllib") {
-            std::string mtl_filename;
-            sscanf(line.c_str(), "mtllib %s", mtl_filename.c_str());
-            material = load_mesh_material("resources/models/" + mtl_filename);
+            // std::string mtl_filename;
+            char mtl_filename[256];
+            sscanf(line.c_str(), "mtllib %s", mtl_filename);
+            material = load_mesh_material("resources/objects/geometric_shapes/" + std::string(mtl_filename));
         } else continue;
     }
 
