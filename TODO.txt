@@ -1,0 +1,68 @@
+# TODO
+
+## STRUCTURE
+
+    # core
+        - context
+        - renderer
+            reads scene and renders it
+        - shader
+        - scene
+            database for pointers to materials, meshes etc
+
+    # game
+        - ai
+        - terrain
+
+    # mem
+        - object_repository
+
+    # net
+
+    # object
+        - mesh
+        - entity
+        - camera
+        - light
+
+    # util
+        - resource loader
+
+
+
+
+
+
+# load obj and mtl (forget about textures!)
+    # create mesh from obj
+    # create shader with mtl parameters
+# create object class, which store mesh, shader id, position
+# move object with keyboard
+# create camera type, that follow object
+    # follow camera holds id of object (or pointer)
+# create scene, which holds objects and camera
+# render scene with renderer
+
+
+i need a mesh manager
+    it should hold every material and mesh
+
+entity should have flags
+    movable etc
+    stream_draw for animated probably?
+
+
+# object is an instance
+# load meshes
+# renderer renders objects
+
+
+# renderer have vector with scene vaos?
+    # push every mesh to scene vao
+    # draw
+
+
+# renderer
+    # own vao, vbo?
+        # which group all the things that should be render into one vao!
+            # or is it to much?

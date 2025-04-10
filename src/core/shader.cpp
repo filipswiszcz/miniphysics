@@ -99,7 +99,7 @@ void core::Shader::set_num(const std::string &name, const unsigned int &count, c
     this -> bind(); glUniform1fv(this -> get_uniform_location(name), count, value);
 }
 
-void core::Shader::set_mat4(const std::string &name, const float *mat, const unsigned int &count = 1, const bool &transpose = false) {
+void core::Shader::set_mat4(const std::string &name, const float *mat, const unsigned int &count, const bool &transpose) {
     this -> bind(); glUniformMatrix4fv(this -> get_uniform_location(name), count, (transpose ? GL_TRUE : GL_FALSE), mat);
 }
 

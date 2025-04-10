@@ -1,11 +1,12 @@
 #include <iostream>
 #include <vector>
 
-#include <rush/core/renderer.hpp>
-#include <rush/core/scene.hpp>
+// #include <rush/core/renderer.hpp>
+// #include <rush/core/scene.hpp>
 #include <rush/core/shader.hpp>
 #include <rush/entity/camera.hpp>
 #include <rush/entity/mesh.hpp>
+#include <rush/mem/object_repository.hpp>
 extern "C" {
     #include <rush/util/log.h>
 }
@@ -110,6 +111,88 @@ void frames_update(GLFWwindow *window) {
 }
 
 int main() {
+    GLFWwindow *window;
+
+    if (!glfwInit()) return -1;
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    window = glfwCreateWindow(WIDTH, HEIGHT, WINDOW_NAME, NULL, NULL);
+    if (!window) {
+        log_fatal("failed to create window"); glfwTerminate(); return -1;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, window_size_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    glEnable(GL_DEPTH_TEST);
+
+    mem::Repository repository;
+
+    // load shader
+    core::Shader shader("shaders/light.vs", "shaders/light.fs");
+    // end of load shader
+
+    // load meshes
+    entity::Mesh mesh = util::load_mesh("resources/objects/geometric_shapes/cube.obj");
+    // end of load meshes
+
+    // render mesh
+    glGenVertexArrays(1, &mesh.get_vao());
+
+    glGenBuffers(1, &mesh.get_vbo());
+    glGenBuffers(1, &mesh.get_ebo());
+
+    glBindVertexArray(mesh.get_vao());
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.get_vbo());
+    glBufferData(GL_ARRAY_BUFFER, mesh.get_vertices().size() * sizeof(float), mesh.get_vertices().data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.get_ebo());
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.get_indices().size() * sizeof(uint32_t), mesh.get_indices().data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    // ned of render mesh
+
+    while (!glfwWindowShouldClose(window)) {
+        // change time
+        float current_frame_time = static_cast<float>(glfwGetTime());
+        CAMERA_TIME_BETWEEN_FRAMES = current_frame_time - CAMERA_TIME_OF_LAST_FRAME;
+        CAMERA_TIME_OF_LAST_FRAME = current_frame_time;
+
+        // frames
+        frames_update(window);
+
+        // render commands
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        shader.bind();
+        // render mesh
+        glBindVertexArray(mesh.get_vao());
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.get_vbo());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.get_ebo());
+        glDrawElements(GL_TRIANGLES, mesh.get_indices().size(), GL_UNSIGNED_INT, 0);
+        // end of render mesh
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+
+    return 0;
+}
+
+/*int main() {
 
     GLFWwindow *window;
 
@@ -132,6 +215,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // shader code
+    core::Shader grid_shader("shaders/grid.vs", "shaders/grid.fs");
     core::Shader shader("shaders/basic.vs", "shaders/basic.fs");
 
 
@@ -187,7 +271,7 @@ int main() {
     // texture
     // unsigned int temp_texture = util::temp_load_texture("resources/textures/witcher_wallpaper.jpg");
     // unsigned int texture = util::temp_load_texture("resources/textures/fantasy_world_map.png");
-    unsigned int texture = util::temp_load_texture("resources/textures/red_metal.jpg");
+    unsigned int texture = util::temp_load_texture("resources/textures/cyberpunk_blue.jpg");
 
     // glUseProgram(program);
     glUniform1i(glGetUniformLocation(shader.get_id(), "texture_t"), 0); // here
@@ -298,11 +382,15 @@ int main() {
     // end of antoher code
 
     // infinite grid code
-
+    // world::Grid grid;
+    // grid.set_shader(std::make_shared<core::Shader>(grid_shader));
+    // grid.bind();
     // end of infinite grid code
 
+    // shader.bind();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(shader.get_id(), "projection"), 1, GL_FALSE, &projection[0][0]); // here
+    // glUniformMatrix4fv(glGetUniformLocation(grid_shader.get_id(), "projection"), 1, GL_FALSE, &projection[0][0]); // here
 
     entity::Camera camera;
     camera.set_position(glm::vec3(0.0f, 1.0f, 3.0f));
@@ -330,10 +418,11 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        glUseProgram(shader.get_id()); // here
+        shader.bind();
 
         glm::mat4 view = camera.get_look_at();
         glUniformMatrix4fv(glGetUniformLocation(shader.get_id(), "view"), 1, GL_FALSE, &view[0][0]); // here
+        // glUniformMatrix4fv(glGetUniformLocation(grid_shader.get_id(), "view"), 1, GL_FALSE, &view[0][0]); // here
         // glm::mat4 model = glm::mat4(1.0f);
         // model = glm::translate(model, positions[0]);
         // glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
@@ -360,6 +449,8 @@ int main() {
         renderer.draw();
         // end of another mesh code
 
+        // log_debug("object pos: %f %f %f", sphere.get_position().x, sphere.get_position().y, sphere.get_position().z);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -369,4 +460,4 @@ int main() {
     glfwTerminate();
 
     return 0;
-}
+}*/
