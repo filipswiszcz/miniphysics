@@ -3,7 +3,7 @@
 !/**/
 !*.*
 
-# cmake files
+# make files
 build
 
 # xcode debug files
