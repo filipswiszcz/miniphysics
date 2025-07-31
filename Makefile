@@ -1,12 +1,23 @@
 CXX ?= g++
 STD ?= c++17
-CWARNINGS := -Wall -Wextra -Wpedantic -Wshadow
-# CXXFLAGS := -std=$(STD) $(CWARNINGS) $(OPENGL_INCLUDE) -I./$(SRC_DIR)
-CXXFLAGS := -std=$(STD) $(CWARNINGS) -I./$(SRC_DIR)
-LDFLAGS := $(OPENGL_LIBS)
 
-# OPENGL_INCLUDE := -I/usr/include/GL -I/usr/include/GLFW
-# OPENGL_LIBS := -lglfw -lGLEW -lGL -lX11 -lpthread
+ifeq ($(OS), Windows_NT)
+  CXXWARNINGS := -Wall -Wextra
+  TARGET = $(BUILD_DIR)/miniphysics.exe
+  OPENGL_LIBS := -lglfw3 -lopengl32 -lgdi32
+else
+  CXXWARNINGS := -Wall -Wextra -Wpedantic -Wshadow
+  TARGET = $(BUILD_DIR)/miniphysics
+  ifeq ($(shell uname -s), Linux)
+    OPENGL_INCLUDE := -I/usr/include/GLFW -I/usr/include/GL
+    OPENGL_LIBS := -lglfw -lGL
+  else ifeq ($(shell uname -s), Darwin)
+    OPENGL_LIBS := -lglfw -framework Cocoa -framework OpenGL -framework IOKit
+  endif
+endif
+
+CXXFLAGS := -std=$(STD) $(CXXWARNINGS) $(OPENGL_INCLUDE) -I./$(SRC_DIR)
+LDFLAGS := $(OPENGL_LIBS)
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -15,10 +26,8 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-TARGET = $(BUILD_DIR)/miniphysics
-
 $(TARGET): $(OBJS)
-	$(CXX) $(LDFLAGS) $^ -o $@
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
