@@ -1,5 +1,9 @@
-#include <iostream>
+#include "game.h"
 
 int main(void) {
-    std::cout << "Wow!";
+    Game game;
+    game.initialize();
+    game.loop();
+    game.stop();
+    return 0;
 }
