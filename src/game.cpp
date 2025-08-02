@@ -1,7 +1,7 @@
 #include "game.h"
 
 void Game::initialize() {
-    if (!glfwInit()) {return;}
+    ASSERT(glfwInit(), "Failed to initialize GLFW\n");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -12,9 +12,18 @@ void Game::initialize() {
     
     this -> context = {};
     this -> context.window = glfwCreateWindow(this -> window.width, this -> window.height, this -> window.name.c_str(), NULL, NULL);
-    if (!this -> context.window) {return;}
+    ASSERT(this -> context.window, "Failed to create OpenGL window\n");
 
     glfwMakeContextCurrent(this -> context.window);
+
+#ifndef __APPLE__
+    glewExperimental = 1;
+    ASSERT(glewInit(), "Failed to initialize GLEW\n");
+#endif
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 }
 
 void Game::loop() {

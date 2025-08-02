@@ -12,6 +12,7 @@ Physics engine implemented in C++17.
 ### System-specific
 #### Linux
 * build-essential or equivalent (GCC, Make)
+* GLEW
 #### macOS
 * Xcode Command Line Tools
 * Homebrew (recommended for GLFW installation: `brew install glfw`)
@@ -20,6 +21,7 @@ Physics engine implemented in C++17.
 #### Windows
 * Microsoft Visual Studio (2019 or newer recommended) with C++ tools
 * vcpkg (recommended for GLFW installation: `vcpkg install glfw3`)
+* GLEW
 
 ## Compiling
 #### Linux/macOS

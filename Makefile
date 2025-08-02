@@ -4,13 +4,13 @@ STD ?= c++17
 ifeq ($(OS), Windows_NT)
   CXXWARNINGS := -Wall -Wextra
   TARGET = $(BUILD_DIR)/miniphysics.exe
-  OPENGL_LIBS := -lglfw3 -lopengl32 -lgdi32
+  OPENGL_LIBS := -lglfw3 -lGLEW -lopengl32 -lgdi32
 else
   CXXWARNINGS := -Wall -Wextra -Wpedantic -Wshadow
   TARGET = $(BUILD_DIR)/miniphysics
   ifeq ($(shell uname -s), Linux)
     OPENGL_INCLUDE := -I/usr/include/GLFW -I/usr/include/GL
-    OPENGL_LIBS := -lglfw -lGL
+    OPENGL_LIBS := -lglfw -lGLEW -lGL
   else ifeq ($(shell uname -s), Darwin)
     OPENGL_LIBS := -lglfw -framework Cocoa -framework OpenGL -framework IOKit
   endif

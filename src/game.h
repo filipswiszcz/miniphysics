@@ -3,7 +3,17 @@
 
 #include <string>
 
-#include <GLFW/glfw3.h>
+#ifdef __APPLE__
+    #define GL_SILENCE_DEPRECATION
+    #define GLFW_INCLUDE_GLCOREARB
+    #include <GLFW/glfw3.h>
+#else
+    #include <GL/glew.h>
+    #include <GLFW/glfw3.h>
+#endif
+
+#include "common.h"
+#include "shader.h"
 
 typedef struct Window {
     int width, height;
