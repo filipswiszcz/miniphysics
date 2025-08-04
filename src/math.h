@@ -1,6 +1,10 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+// FLOAT
+
+float q_rsqrt(float v);
+
 // VECTOR
 
 typedef struct Vec2 {
@@ -77,7 +81,7 @@ typedef struct Vec4 {
 
 float radians(float degrees);
 
-Vec3_t normalize(const Vec3_t a, const Vec3_t b);
+Vec3_t normalize(const Vec3_t v);
 
 Vec3_t cross(const Vec3_t a, const Vec3_t b);
 
