@@ -1,7 +1,12 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <iostream>
+#include <iomanip>
+
 // FLOAT
+
+float q_tan(float v);
 
 float q_rsqrt(float v);
 
@@ -98,8 +103,20 @@ typedef struct {
     float m[4][4];
 } Mat4_t;
 
+Mat4_t orthographic(float l, float r, float b, float t, float znear, float zfar);
+
+Mat4_t perspective(float fovy, float aspect, float znear, float zfar);
+
+Mat4_t translate(Mat4_t m, Vec3_t v);
+
+Mat4_t rotate(Mat4_t m, float angle, Vec3_t v);
+
+Mat4_t look_at(Vec3_t pos, Vec3_t target, Vec3_t up);
+
 // QUATERNION
 
 typedef Vec4_t Quat_t;
+
+Mat4_t rotate_quat(Mat4_t m, Quat_t q);
 
 #endif // !__MATH_H_
