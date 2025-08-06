@@ -6,6 +6,12 @@
 
 // FLOAT
 
+float sin(float v);
+
+float cos(float v);
+
+float tan(float v);
+
 float q_tan(float v);
 
 float q_rsqrt(float v);
@@ -92,7 +98,7 @@ Vec3_t cross(const Vec3_t a, const Vec3_t b);
 
 // MATRIX
 
-#define Mat4(v) ((Mat4_t) {.m = { \
+#define Mat4(v) ((Mat4_t) {{ \
     {v, 0, 0, 0}, \
     {0, v, 0, 0}, \
     {0, 0, v, 0}, \

@@ -2,6 +2,12 @@
 
 // FLOAT
 
+float sin(float v) {}
+
+float cos(float v) {}
+
+float tan(float v) {}
+
 float q_tan(float v) { // blows up near +-PI/2 (90 or -90 degrees)
     float pisqby4 = 2.4674011002723397f;
     float om8bypisq = 0.1894305308612978f;
@@ -75,7 +81,7 @@ Mat4_t orthographic(float l, float r, float b, float t, float znear, float zfar)
 
 Mat4_t perspective(float fovy, float aspect, float znear, float zfar) {
     float rad = fovy;
-    float tan_half_fovy = q_tan(rad / 2);
+    float tan_half_fovy = q_tan(rad / 2); // replace with tan();
 
     Mat4_t res = Mat4(0);
     res.m[0][0] = 1.0f / (aspect * tan_half_fovy);
@@ -87,3 +93,44 @@ Mat4_t perspective(float fovy, float aspect, float znear, float zfar) {
 
     return res;
 }
+
+Mat4_t translate(Mat4_t m, Vec3_t v) {
+    Mat4_t res = m;
+    res.m[3][0] += v.x;
+    res.m[3][1] += v.y;
+    res.m[3][2] += v.z;
+    return res;
+}
+
+Mat4_t rotate(Mat4_t m, float angle, Vec3_t v) {
+    // float const a = radians(angle);
+    // float const c = q_cos(a);
+    // float const s = q_sin(a);
+}
+
+Mat4_t look_at(Vec3_t pos, Vec3_t target, Vec3_t up) {
+    const Vec3_t t = normalize(target - pos);
+    const Vec3_t r = normalize(cross(t, up));
+    const Vec3_t u = normalize(cross(r, t));
+
+    Mat4_t res = Mat4(1);
+    res.m[0][0] = r.x;
+    res.m[1][0] = r.y;
+    res.m[2][0] = r.z;
+    res.m[0][1] = u.x;
+    res.m[1][1] = u.y;
+    res.m[2][1] = u.z;
+    res.m[0][2] = -t.x;
+    res.m[1][2] = -t.y;
+    res.m[2][2] = -t.z;
+    res.m[3][0] = -dot(r, pos);
+    res.m[3][1] = -dot(u, pos);
+    res.m[3][2] = dot(t, pos);
+    res.m[3][3] = 1.0f;
+
+    return res;
+}
+
+// QUATERNION
+
+Mat4_t rotate_quat(Mat4_t m, Quat_t q) {}
