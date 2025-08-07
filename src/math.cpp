@@ -55,7 +55,7 @@ float dot(const Vec3_t a, const Vec3_t b) {
 
 // MATRIX
 
-void __read_mat4(Mat4_t m) {
+/*static void _read_mat4(Mat4_t m) {
     for (int i = 0; i < 4; i++) { // fun fact: cpu registers are often 32 or 64-bit wide and the loop control variables are almost always stored in CPU registers
         std::cout << "[";
         for (int j = 0; j < 4; j++) {
@@ -65,7 +65,7 @@ void __read_mat4(Mat4_t m) {
         std::cout << "]\n";
     }
     std::cout << "\n";
-}
+}*/
 
 Mat4_t orthographic(float l, float r, float b, float t, float znear, float zfar) {
     Mat4_t res = Mat4(0);

@@ -1,6 +1,7 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <cstdint>
 #include <iostream>
 #include <iomanip>
 
@@ -98,16 +99,38 @@ Vec3_t cross(const Vec3_t a, const Vec3_t b);
 
 // MATRIX
 
-#define Mat4(v) ((Mat4_t) {{ \
+/*#define Mat4(v) ((Mat4_t) {{ \
     {v, 0, 0, 0}, \
     {0, v, 0, 0}, \
     {0, 0, v, 0}, \
     {0, 0, 0, v} \
-}})
+}})*/
 
-typedef struct {
+typedef struct Mat4 {
     float m[4][4];
+
+    explicit Mat4(float v) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                m[i][j] = (i == j) ? v : 0;
+            }
+        }
+    }
+    
 } Mat4_t;
+
+static void _read_mat4(Mat4_t m) {
+    for (int i = 0; i < 4; i++) { // fun fact: cpu registers are of ten 32 or 64-bit wide and the loop control variables are almost always stored in CPU registers
+        std::cout << "[";
+        for (int j = 0; j < 4; j++) {
+            // std::cout << std::fixed << ((width) ? std::setw(width) : std::setw(1)) << std::setprecision(6) << m.m[i][j]; it doesn't fucking work :(
+            std::cout << std::fixed << std::setprecision(6) << m.m[i][j];
+            if (j < 3) std::cout << " ";
+        }
+        std::cout << "]\n";
+    }
+    std::cout << "\n";
+}
 
 Mat4_t orthographic(float l, float r, float b, float t, float znear, float zfar);
 
