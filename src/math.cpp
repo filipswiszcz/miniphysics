@@ -2,7 +2,24 @@
 
 // FLOAT
 
-float sin(float v) {}
+float sin(float v) {
+    int x = 14;
+    
+    // del s
+    std::cout << "x=" << x << std::endl;
+    __asm__(
+        "movl %1, %%eax\n"
+        "addl $1, %%eax\n"
+        "movl %%eax, %0\n"
+        : "=r" (x)
+        : "r" (x)
+        : "%eax"
+    );
+    std::cout << "x=" << x << std::endl;
+    // del e
+
+    return 1.0f;
+}
 
 float cos(float v) {}
 
