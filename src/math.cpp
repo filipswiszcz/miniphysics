@@ -2,7 +2,7 @@
 
 // FLOAT
 
-float sin(float v) {
+/*float sin(float v) {
     int x = 14;
     
     // del s
@@ -19,13 +19,13 @@ float sin(float v) {
     // del e
 
     return 1.0f;
-}
+}*/
 
-float cos(float v) {}
+// float cos(float v) {}
 
-float tan(float v) {}
+// float tan(float v) {}
 
-float q_tan(float v) { // blows up near +-PI/2 (90 or -90 degrees)
+/*float q_tan(float v) { // blows up near +-PI/2 (90 or -90 degrees)
     float pisqby4 = 2.4674011002723397f;
     float om8bypisq = 0.1894305308612978f;
     float vsq = v * v;
@@ -44,7 +44,7 @@ float q_rsqrt(float v) {
     y = y * (1.5f - (x2 * y * y));
     
     return y;
-}
+}*/
 
 // VECTOR
 
@@ -120,9 +120,38 @@ Mat4_t translate(Mat4_t m, Vec3_t v) {
 }
 
 Mat4_t rotate(Mat4_t m, float angle, Vec3_t v) {
-    // float const a = radians(angle);
-    // float const c = q_cos(a);
-    // float const s = q_sin(a);
+    float const a = radians(angle);
+    float const c = cos(a);
+    float const s = sin(a);
+
+    Vec3_t axis = normalize(v);
+
+    Mat4_t rot = Mat4(0);
+    rot.m[0][0] = c + (1 - c) * axis.x * axis.x;
+    rot.m[0][1] = (1 - c) * axis.x * axis.y - s * axis.z;
+    rot.m[0][2] = (1 - c) * axis.x * axis.z + s * axis.y;
+
+    rot.m[1][0] = (1 - c) * axis.y * axis.x + s * axis.z;
+    rot.m[1][1] = c + (1 - c) * axis.y * axis.y;
+    rot.m[1][2] = (1 - c) * axis.y * axis.z - s * axis.x;
+
+    rot.m[2][0] = (1 - c) * axis.z * axis.x - s * axis.y;
+    rot.m[2][1] = (1 - c) * axis.z * axis.y + s * axis.x;
+    rot.m[2][2] = c + (1 - c) * axis.z * axis.z;
+
+    rot.m[3][3] = 1.0f;
+
+    Mat4_t res = Mat4(0);
+    for (uint32_t i = 0; i < 4; i++) {
+        for (uint32_t j = 0; j < 4; j++) {
+            res.m[i][j] = 0;
+            for (uin32_t k = 0; k < 4; k++) {
+                res.m[i][j] += m.m[i][k] * rot.m[k][j];
+            }
+        }
+    }
+
+    return res;
 }
 
 Mat4_t look_at(Vec3_t pos, Vec3_t target, Vec3_t up) {

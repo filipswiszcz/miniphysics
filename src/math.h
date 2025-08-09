@@ -4,10 +4,11 @@
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 // FLOAT
 
-float sin(float v);
+/*float sin(float v);
 
 float cos(float v);
 
@@ -15,7 +16,7 @@ float tan(float v);
 
 float q_tan(float v);
 
-float q_rsqrt(float v);
+float q_rsqrt(float v);*/
 
 // VECTOR
 
