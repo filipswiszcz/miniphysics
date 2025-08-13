@@ -14,11 +14,13 @@ float cos(float v);
 
 float tan(float v);
 
-float q_tan(float v);
+float q_tan(float v);*/
 
-float q_rsqrt(float v);*/
+float q_rsqrt(float v);
 
 // VECTOR
+
+#define Vec2(x, y) ((Vec2_t) {x, y})
 
 typedef struct Vec2 {
     float x, y;
@@ -43,6 +45,8 @@ typedef struct Vec2 {
     }
 
 } Vec2_t;
+
+#define Vec3(x, y, z) ((Vec3_t) {x, y, z})
 
 typedef struct Vec3 {
     float x, y, z;

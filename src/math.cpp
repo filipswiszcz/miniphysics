@@ -30,7 +30,7 @@
     float om8bypisq = 0.1894305308612978f;
     float vsq = v * v;
     return v * (pisqby4 - om8bypisq * vsq) / (pisqby4 - vsq);
-}
+}*/
 
 float q_rsqrt(float v) {
     long i;
@@ -44,7 +44,7 @@ float q_rsqrt(float v) {
     y = y * (1.5f - (x2 * y * y));
     
     return y;
-}*/
+}
 
 // VECTOR
 
@@ -52,10 +52,16 @@ float radians(float degrees) {
     return degrees * 0.01745329251994329576923690768489;
 }
 
+// Vec3_t normalize(const Vec3_t v) {
+//     float l = v.x * v.x + v.y * v.y + v.z * v.z;
+//     float rl = q_rsqrt(l);
+//     return {v.x * rl, v.y * rl, v.z * rl};
+// }
+
 Vec3_t normalize(const Vec3_t v) {
-    float l = v.x * v.x + v.y * v.y + v.z * v.z;
-    float rl = q_rsqrt(l);
-    return {v.x * rl, v.y * rl, v.z * rl};
+    float l = sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+    if (l < 0.00001f) return {0.0f, 0.0f, 0.0f};
+    return {v.x / l, v.y / l, v.z / l};
 }
 
 Vec3_t cross(const Vec3_t a, const Vec3_t b) {
@@ -98,14 +104,16 @@ Mat4_t orthographic(float l, float r, float b, float t, float znear, float zfar)
 
 Mat4_t perspective(float fovy, float aspect, float znear, float zfar) {
     float rad = fovy;
-    float tan_half_fovy = q_tan(rad / 2); // replace with tan();
+    float tan_half_fovy = tan(rad / 2.0f);
 
-    Mat4_t res = Mat4(0);
+    Mat4_t res = Mat4(0.0f);
     res.m[0][0] = 1.0f / (aspect * tan_half_fovy);
-    res.m[1][1] = 1.0f / (tan_half_fovy);
+    res.m[1][1] = 1.0f / tan_half_fovy;
     res.m[2][2] = -(zfar + znear) / (zfar - znear);
+    // res.m[2][2] = (zfar + znear) / (znear - zfar);
     res.m[2][3] = -1.0f;
     res.m[3][2] = -(2.0f * zfar * znear) / (zfar - znear);
+    // res.m[3][2] = (2.0f * zfar * znear) / (znear - zfar);
     res.m[3][3] = 0.0f;
 
     return res;
@@ -145,7 +153,7 @@ Mat4_t rotate(Mat4_t m, float angle, Vec3_t v) {
     for (uint32_t i = 0; i < 4; i++) {
         for (uint32_t j = 0; j < 4; j++) {
             res.m[i][j] = 0;
-            for (uin32_t k = 0; k < 4; k++) {
+            for (uint32_t k = 0; k < 4; k++) {
                 res.m[i][j] += m.m[i][k] * rot.m[k][j];
             }
         }
@@ -154,27 +162,29 @@ Mat4_t rotate(Mat4_t m, float angle, Vec3_t v) {
     return res;
 }
 
-Mat4_t look_at(Vec3_t pos, Vec3_t target, Vec3_t up) {
-    const Vec3_t t = normalize(target - pos);
-    const Vec3_t r = normalize(cross(t, up));
+Mat4_t look_at(Vec3_t position, Vec3_t target, Vec3_t head) {
+    const Vec3_t t = normalize(target - position);
+    const Vec3_t r = normalize(cross(t, head));
     const Vec3_t u = normalize(cross(r, t));
 
-    Mat4_t res = Mat4(1);
-    res.m[0][0] = r.x;
-    res.m[1][0] = r.y;
-    res.m[2][0] = r.z;
-    res.m[0][1] = u.x;
-    res.m[1][1] = u.y;
-    res.m[2][1] = u.z;
-    res.m[0][2] = -t.x;
-    res.m[1][2] = -t.y;
-    res.m[2][2] = -t.z;
-    res.m[3][0] = -dot(r, pos);
-    res.m[3][1] = -dot(u, pos);
-    res.m[3][2] = dot(t, pos);
-    res.m[3][3] = 1.0f;
+    Mat4_t result = Mat4(1.0f);
+    result.m[0][0] = r.x;
+    result.m[1][0] = r.y;
+    result.m[2][0] = r.z;
 
-    return res;
+    result.m[0][1] = u.x;
+    result.m[1][1] = u.y;
+    result.m[2][1] = u.z;
+    
+    result.m[0][2] = -t.x;
+    result.m[1][2] = -t.y;
+    result.m[2][2] = -t.z;
+    result.m[3][0] = -dot(r, position);
+    result.m[3][1] = -dot(u, position);
+    result.m[3][2] = dot(t, position);
+    result.m[3][3] = 1.0f;
+
+    return result;
 }
 
 // QUATERNION
