@@ -18,6 +18,7 @@
 
 class Shader {
 public:
+    uint32_t get_program() {return program;}
     void create_program(std::string vertex_shader_path, std::string fragment_shader_path);
     void set_vec3(std::string name, Vec3_t vec);
     void set_mat4(std::string name, Mat4_t mat);
