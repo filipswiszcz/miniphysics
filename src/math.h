@@ -1,12 +1,14 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-#include <cstdint>
-#include <iostream>
-#include <iomanip>
 #include <cmath>
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
 
 // FLOAT
+
+float radians(float degrees);
 
 /*float sin(float v);
 
@@ -14,9 +16,9 @@ float cos(float v);
 
 float tan(float v);
 
-float q_tan(float v);*/
+float q_tan(float v);
 
-float q_rsqrt(float v);
+float q_rsqrt(float v);*/
 
 // VECTOR
 
@@ -72,6 +74,8 @@ typedef struct Vec3 {
 
 } Vec3_t;
 
+#define Vec4(x, y, z, w) ((Vec4_t) {x, y, z, w})
+
 typedef struct Vec4 {
     float x, y, z, w;
 
@@ -93,23 +97,26 @@ typedef struct Vec4 {
     Vec4 &operator*=(const float s) {
         return (x *= s, y *= s, z *= s, w *= s, *this);
     }
+    Vec4 operator/(const float s) const {
+        return {x / s, y / s, z / s, w / s};
+    }
+    Vec4 &operator/=(const float s) {
+        return (x / s, y / s, z / s, w / s, *this);
+    }
 
 } Vec4_t;
-
-float radians(float degrees);
 
 Vec3_t normalize(const Vec3_t v);
 
 Vec3_t cross(const Vec3_t a, const Vec3_t b);
 
-// MATRIX
+float dot(const Vec3_t a, const Vec3_t b);
 
-/*#define Mat4(v) ((Mat4_t) {{ \
-    {v, 0, 0, 0}, \
-    {0, v, 0, 0}, \
-    {0, 0, v, 0}, \
-    {0, 0, 0, v} \
-}})*/
+float determinant3v(Vec3_t a, Vec3_t b, Vec3_t c);
+
+double length(const Vec3_t v);
+
+// MATRIX
 
 typedef struct Mat4 {
     float m[4][4];
@@ -121,8 +128,48 @@ typedef struct Mat4 {
             }
         }
     }
+
+    Mat4 operator*(const Mat4 &o) const {
+        Mat4 r(0.0f);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    r.m[i][j] += m[i][k] * o.m[k][j];
+                }
+            }
+        }
+        return r;
+    }
+    Mat4 &operator*=(const Mat4 &o) {
+        *this = *this * o;
+        return *this;
+    }
+    Mat4 operator/(const Mat4 &o) const {
+        Mat4 r(0.0f);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                r.m[i][j] = m[i][j] / o.m[i][j];
+            }
+        }
+        return r;
+    }
+    Mat4 &operator/=(const Mat4 &o) {
+        *this = *this / o;
+        return *this;
+    }
     
 } Mat4_t;
+
+inline Vec4_t operator*(const Mat4_t &m, const Vec4_t &o) {
+    Vec4_t r;
+
+    r.x = m.m[0][0] * o.x + m.m[0][1] * o.y + m.m[0][2] * o.z + m.m[0][3] * o.w;
+    r.y = m.m[1][0] * o.x + m.m[1][1] * o.y + m.m[1][2] * o.z + m.m[1][3] * o.w;
+    r.z = m.m[2][0] * o.x + m.m[2][1] * o.y + m.m[2][2] * o.z + m.m[2][3] * o.w;
+    r.w = m.m[3][0] * o.x + m.m[3][1] * o.y + m.m[3][2] * o.z + m.m[3][3] * o.w;
+
+    return r;
+}
 
 static void _read_mat4(Mat4_t m) {
     for (int i = 0; i < 4; i++) { // fun fact: cpu registers are of ten 32 or 64-bit wide and the loop control variables are almost always stored in CPU registers
@@ -146,6 +193,14 @@ Mat4_t translate(Mat4_t m, Vec3_t v);
 Mat4_t rotate(Mat4_t m, float angle, Vec3_t v);
 
 Mat4_t look_at(Vec3_t pos, Vec3_t target, Vec3_t up);
+
+Mat4_t inverse(Mat4_t m);
+
+float determinant(Mat4_t m);
+
+// vec<3, T, Q> const& win, mat<4, 4, T, Q> const& model, mat<4, 4, T, Q> const& proj, vec<4, U, Q> const& viewport
+// pointers should be used in args
+Vec3_t unproject(const Vec3_t v, const Mat4_t model, const Mat4_t projection, const Vec4_t viewport);
 
 // QUATERNION
 

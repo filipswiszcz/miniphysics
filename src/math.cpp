@@ -2,6 +2,10 @@
 
 // FLOAT
 
+float radians(float degrees) {
+    return degrees * 0.01745329251994329576923690768489;
+}
+
 /*float sin(float v) {
     int x = 14;
     
@@ -32,7 +36,7 @@
     return v * (pisqby4 - om8bypisq * vsq) / (pisqby4 - vsq);
 }*/
 
-float q_rsqrt(float v) {
+/*float q_rsqrt(float v) {
     long i;
     float x2, y;
 
@@ -44,13 +48,9 @@ float q_rsqrt(float v) {
     y = y * (1.5f - (x2 * y * y));
     
     return y;
-}
+}*/
 
 // VECTOR
-
-float radians(float degrees) {
-    return degrees * 0.01745329251994329576923690768489;
-}
 
 // Vec3_t normalize(const Vec3_t v) {
 //     float l = v.x * v.x + v.y * v.y + v.z * v.z;
@@ -74,6 +74,14 @@ Vec3_t cross(const Vec3_t a, const Vec3_t b) {
 
 float dot(const Vec3_t a, const Vec3_t b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+float determinant3v(Vec3_t a, Vec3_t b, Vec3_t c) {
+    return a.x * (b.y * c.z - b.z * c.y) - a.y * (b.x * c.z - b.z * c.x) + a.z * (b.x * c.y - b.y * c.x);
+}
+
+double length(const Vec3_t v) {
+    return sqrt(dot(v, v));
 }
 
 // MATRIX
@@ -185,6 +193,65 @@ Mat4_t look_at(Vec3_t position, Vec3_t target, Vec3_t head) {
     result.m[3][3] = 1.0f;
 
     return result;
+}
+
+Mat4_t inverse(Mat4_t m) {
+    float d = determinant(m);
+    
+    Mat4_t res(0.0f);
+    if (std::abs(d) < 1e-8f) {
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                res.m[i][j] = (i == j) ? 1.0f : 0.0f;
+            }
+        }
+        return res;
+    }
+
+    float id = 1.0f / d;
+    res.m[0][0] = determinant3v(Vec3(m.m[1][1], m.m[1][2], m.m[1][3]), Vec3(m.m[2][1], m.m[2][2], m.m[2][3]), Vec3(m.m[3][1], m.m[3][2], m.m[3][3])) * id;
+    res.m[0][1] = -determinant3v(Vec3(m.m[1][0], m.m[1][2], m.m[1][3]), Vec3(m.m[2][0], m.m[2][2], m.m[2][3]), Vec3(m.m[3][0], m.m[3][2], m.m[3][3])) * id;
+    res.m[0][2] = determinant3v(Vec3(m.m[1][0], m.m[1][1], m.m[1][3]), Vec3(m.m[2][0], m.m[2][1], m.m[2][3]), Vec3(m.m[3][0], m.m[3][1], m.m[3][3])) * id;
+    res.m[0][3] = -determinant3v(Vec3(m.m[1][0], m.m[1][1], m.m[1][2]), Vec3(m.m[2][0], m.m[2][1], m.m[2][2]), Vec3(m.m[3][0], m.m[3][1], m.m[3][2])) * id;
+    res.m[1][0] = -determinant3v(Vec3(m.m[0][1], m.m[0][2], m.m[0][3]), Vec3(m.m[2][1], m.m[2][2], m.m[2][3]), Vec3(m.m[3][1], m.m[3][2], m.m[3][3])) * id;
+    res.m[1][1] = determinant3v(Vec3(m.m[0][0], m.m[0][2], m.m[0][3]), Vec3(m.m[2][0], m.m[2][2], m.m[2][3]), Vec3(m.m[3][0], m.m[3][2], m.m[3][3])) * id;
+    res.m[1][2] = -determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][3]), Vec3(m.m[2][0], m.m[2][1], m.m[2][3]), Vec3(m.m[3][0], m.m[3][1], m.m[3][3])) * id;
+    res.m[1][3] = determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][2]), Vec3(m.m[2][0], m.m[2][1], m.m[2][2]), Vec3(m.m[3][0], m.m[3][1], m.m[3][3])) * id;
+    res.m[2][0] = determinant3v(Vec3(m.m[0][1], m.m[0][2], m.m[0][3]), Vec3(m.m[1][1], m.m[1][2], m.m[1][3]), Vec3(m.m[3][1], m.m[3][2], m.m[3][3])) * id;
+    res.m[2][1] = -determinant3v(Vec3(m.m[0][0], m.m[0][2], m.m[0][3]), Vec3(m.m[1][0], m.m[1][2], m.m[1][3]), Vec3(m.m[3][0], m.m[3][2], m.m[3][3])) * id;
+    res.m[2][2] = determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][3]), Vec3(m.m[1][0], m.m[1][1], m.m[1][3]), Vec3(m.m[3][0], m.m[3][1], m.m[3][3])) * id;
+    res.m[2][3] = -determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][2]), Vec3(m.m[1][0], m.m[1][1], m.m[1][2]), Vec3(m.m[3][0], m.m[3][1], m.m[3][2])) * id;
+    res.m[3][0] = -determinant3v(Vec3(m.m[0][1], m.m[0][2], m.m[0][3]), Vec3(m.m[1][1], m.m[1][2], m.m[1][3]), Vec3(m.m[2][1], m.m[2][2], m.m[2][3])) * id;
+    res.m[3][1] = determinant3v(Vec3(m.m[0][0], m.m[0][2], m.m[0][3]), Vec3(m.m[1][0], m.m[1][1], m.m[1][3]), Vec3(m.m[2][0], m.m[2][2], m.m[2][3])) * id;
+    res.m[3][2] = -determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][3]), Vec3(m.m[1][0], m.m[1][1], m.m[1][3]), Vec3(m.m[2][0], m.m[2][1], m.m[2][3])) * id;
+    res.m[3][3] = determinant3v(Vec3(m.m[0][0], m.m[0][1], m.m[0][2]), Vec3(m.m[1][0], m.m[1][1], m.m[1][2]), Vec3(m.m[2][0], m.m[2][1], m.m[2][2])) * id;
+
+    return res;
+}
+
+float determinant(Mat4_t m) {
+    float d = 0.0f;
+    d += m.m[0][0] * determinant3v(Vec3(m.m[1][1], m.m[1][2], m.m[1][3]), Vec3(m.m[2][1], m.m[2][2], m.m[2][3]), Vec3(m.m[3][1], m.m[3][2], m.m[3][3]));
+    d -= m.m[0][1] * determinant3v(Vec3(m.m[1][0], m.m[1][2], m.m[1][3]), Vec3(m.m[2][0], m.m[2][2], m.m[2][3]), Vec3(m.m[3][0], m.m[3][2], m.m[3][3]));
+    d += m.m[0][2] * determinant3v(Vec3(m.m[1][0], m.m[1][1], m.m[1][3]), Vec3(m.m[2][0], m.m[2][1], m.m[2][3]), Vec3(m.m[3][0], m.m[3][1], m.m[3][3]));
+    d -= m.m[0][3] * determinant3v(Vec3(m.m[1][0], m.m[1][1], m.m[1][2]), Vec3(m.m[2][0], m.m[2][1], m.m[2][2]), Vec3(m.m[3][0], m.m[3][1], m.m[3][2]));
+    return d;
+}
+
+Vec3_t unproject(const Vec3_t v, const Mat4_t model, const Mat4_t projection, const Vec4_t viewport) {
+    Mat4_t inv = inverse(projection * model);
+
+    Vec4_t temporary = Vec4(v.x, v.y, v.z, 1.0f);
+    temporary.x = (temporary.x - viewport.x) / viewport.z * 2.0f - 1.0f;
+    temporary.y = (temporary.y - viewport.y) / viewport.w * 2.0f - 1.0f;
+    temporary.z = temporary.z * 2.0f - 1.0f;
+
+    Vec4_t object = inv * temporary;
+    if (object.w != 0.0f) {
+        object /= object.w;
+    }
+
+    return {object.x, object.y, object.z};
 }
 
 // QUATERNION
